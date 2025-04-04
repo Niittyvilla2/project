@@ -13,7 +13,7 @@ pixel_row = 0 #row of pixels where the text prints
 while True:
     if pixel_row >= 63:
         oled.scroll(0, -8)
-        oled.rect(0, 55, 127, 8, 0, True)
+        display.rect(10, 10, 107, 43, 1)   
         pixel_row = 55 #move the pixel row so it stays on screen
     text = input("")
     oled.text(text, 0, pixel_row, 1) #put the row the pixels print lower
