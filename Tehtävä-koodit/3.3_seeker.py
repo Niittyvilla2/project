@@ -8,7 +8,7 @@ class Encoder:
     def __init__(self, rA, rB):
         self.a = Pin(rA, mode=Pin.IN)
         self.b = Pin(rB, mode=Pin.IN)
-        self.fifo = Fifo(1000, typecode='i')
+        self.fifo = Fifo(50, typecode='i')
         self.a.irq(handler=self.handler, trigger=Pin.IRQ_RISING, hard=True)
 
     def handler(self, pin):
@@ -59,11 +59,12 @@ oled.show()
 
 while True:
     if rot.fifo.has_data():
-        cursor += rot.fifo.get()
-        if cursor > len(data) - 63:
-            cursor = len(data) - 63
-        if cursor < 64:
-            cursor = 64
+        while rot.fifo.has_data():
+            cursor += rot.fifo.get()
+            if cursor > len(data) - 63:
+                cursor = len(data) - 63
+            if cursor < 64:
+                cursor = 64
         oled.fill(0)
         a = cursor - 64
         b = cursor + 63
