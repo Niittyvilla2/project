@@ -118,7 +118,7 @@ def mesure_menu():
     oled.fill(0)
     oled.text("Start/Stop", 10, 0, 1)
     oled.text("Back", 10, 10, 1)
-    oled.text("BPM: ", 0, 20, 1) #add method that shows BPM and updates every 5 seconds
+    oled.text("BPM: ", 0, 20, 1) #call method that shows BPM and updates every 5 seconds
     oled.fill_rect(0, 30, 128, 64, 1) #place holder for Live PPG
     mesure_cursor(0)
     oled.show()
@@ -142,8 +142,15 @@ def mesure_menu():
                 main_menu()
                 mesureMenu = False
             if place == 0:
-                #add method that starts mesuring when pressed and stops when pressed again
+                #call method that starts mesuring when pressed and stops when pressed again
                 pass
+
+def analysis_menu():
+    pass
+    
+def history_menu():
+    pass
+
 
 #defining stuff
 rot = Encoder(10, 11)
