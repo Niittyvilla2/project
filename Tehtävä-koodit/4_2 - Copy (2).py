@@ -2,6 +2,7 @@ from filefifo import Filefifo
 from fifo import Fifo
 from machine import UART, Pin, I2C, Timer, ADC
 from ssd1306 import SSD1306_I2C
+from piotimer import Piotimer
 
 class Encoder:
     def __init__(self, rA, rB):
@@ -25,16 +26,20 @@ def adjust(y, scale, offset):
     return y
 
 def draw(points, screen, cursor):
-    if cursor < 250:
-        scale = getScale(points[0:250])
-        offset= getOffset(points[0:250])
-    else:
-        scale = getScale(points[cursor-250:cursor-1])
-        offset= getOffset(points[cursor-250:cursor-1])
+    show = []
+    i = 0
+    for _ in range(len(points)/5-1):
+        a = 0
+        for _ in range(5):
+            a += points[i]
+            i += 1
+        show.append(a/5)
+    scale = getScale(show[cursor:cursor+127])
+    offset= getOffset(show[cursor:cursor+127])
     screen.fill(0)
     x = 1
-    prev = adjust(int(points[cursor]), scale, offset)
-    for y in points[cursor+1:cursor+127]:
+    prev = adjust(int(show[int(cursor/5)]), scale, offset)
+    for y in show[cursor+1:cursor+127]:
         y = adjust(y, scale, offset)
         screen.line(x-1, prev, x, y, 1)
         prev = y
@@ -58,8 +63,14 @@ def getOffset(list):
             low = i
     return low
 
-rot = Encoder(10, 11)
-data = Filefifo(10, name='capture02_250Hz.txt')
+def advance(tid):
+    global cursor
+    cursor += 1
+    if cursor > 900:
+        tmr.deinit()
+
+data = Filefifo(10, name='capture01_250Hz.txt')
+cursor = 0
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
 oled_w = 128
 oled_h = 64
@@ -68,43 +79,9 @@ datas = []
 high = data.get()
 low = high
 datas.append(high)
-cursor = 0
+for _ in range(9999):
+    datas.append(data.get())
+tmr = Piotimer(period=50, mode=Piotimer.PERIODIC, callback=advance)
 
-
-for i in range(500):
-    a = 0
-    for _ in range(5):
-        a += data.get()
-    d = a / 5
-    if d > high:
-        high = d
-    if d < low:
-        low = d
-    datas.append(d)
-i = 0
-
-for d in datas:
-    d -= low
-    d /= (high - low) / 64
-    d = int(d)
-    if d > 63:
-        d = 63
-    datas[i] = d
-    i += 1
-    
-    
-first = datas[0:127]
-oled.fill(0)
-draw(first, oled, cursor)
-oled.show()
-print(len(datas))
-
-while True:
-    if rot.fifo.has_data():
-        while rot.fifo.has_data():
-            cursor += rot.fifo.get()
-            if cursor > len(datas) - 127:
-                cursor = len(datas) - 127
-            if cursor < 0:
-                cursor = 0
-        draw(datas, oled, cursor)
+while cursor < len(datas) - 128:
+    draw(datas, oled, cursor)
