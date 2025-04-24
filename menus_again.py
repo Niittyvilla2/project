@@ -246,7 +246,11 @@ def kubios_start():
                 kubiosStart = False
                 
 def kubios_mesuring():
-    pass
+    oled.fill(0)
+    oled.text("Mesuring. Press", 0, 0, 1)
+    oled.text("the button to", 0, 10, 1)
+    oled.text("stop early.", 0, 20, 1)
+    oled.show()
     
 #defining stuff
 rot = Encoder(10, 11)
