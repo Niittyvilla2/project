@@ -73,6 +73,8 @@ def kubios_cursor(place):
     oled.fill_rect(0, 56, 10, 64, 0)
     oled.fill_rect(60, 56, 10, 64, 0)
     oled.text(">", place, 56, 1)
+
+
     
 def main_menu():
     #menu UI
@@ -251,8 +253,118 @@ def kubios_mesuring():
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
+    #Progressbar?
+    #gather data for 30s
+    #send and recive data from Kubios, save mesurment with timestamp
+    #save data
+    #move to kubios_results
+    kubiosMesure = True
+    while kubiosMesure == True:
+        if button.onepress():
+            #stop mesurment and dont save it
+            kubios_start()
+            kubiosMesure = False
     
+def kubios_results():
+    oled.fill(0)
+    #display kubios data
+    oled.text("Mean PPI", 0, 0, 1)
+    oled.text("Mean HR", 0, 9, 1)
+    oled.text("RMSDD", 0, 19, 1)
+    oled.text("SDNN", 0, 28, 1)
+    oled.text("SNS", 0, 37, 1)
+    oled.text("PNS", 0, 46, 1)
+    oled.text("Back", 10, 56, 1)
+    kubios_cursor(0)
+    oled.show()
+    kubiosResults = True
+    while kubiosResults == True:
+        if button.onepress():
+            kubios_start()
+            kubiosResults = False
+
+def history_menu():
+    oled.fill(0)
+    oled.text("Back", 10, 0, 1)
+    y = 0
+    alloy = 0
+
+    if len(placeholder) < 5:
+        for a in range(len(placeholder)):
+            y +=10
+            alloy+=1
+            oled.text("Mesurment " + str(alloy), 10, y, 1)
+    elif len(placeholder) >= 5:
+        for a in range(5):
+            y +=10
+            alloy+=1
+            oled.text("Mesurment " + str(alloy), 10, y, 1)
+
+    menu_cursor(0)
+    oled.show()
+    historyMenu = True
+    place = 0
+    while historyMenu == True:
+        if rot.fifo.has_data():
+            i = rot.fifo.get()
+            place +=i
+            if place <= 0:
+                place = 0
+                menu_cursor(0)
+                
+            elif place == 1 and alloy > 0:
+                menu_cursor(10)
+
+            elif place == 2 and alloy >1:
+                menu_cursor(20)
+
+            elif place == 3 and alloy >2:
+                menu_cursor(30)
+                
+            elif place == 4 and alloy >3:
+                menu_cursor(40)
+                
+            elif place == 5 and alloy >4:
+                menu_cursor(50)
+                
+            if place >= alloy:
+                place = alloy
+        oled.show()
+        if button.onepress():
+            if place == 0:
+                main_menu()
+                historyMenu = False
+            if place == 1:
+                history_show(1)
+                historyMenu = False
+            if place == 2:
+                history_show(2)
+                historyMenu = False
+            if place == 3:
+                history_show(3)
+                historyMenu = False
+            if place == 4:
+                history_show(4)
+                historyMenu = False
+            if place == 5:
+                history_show(5)
+                historyMenu = False
+
+def history_show(alloy):
+
+    oled.fill(0)
+    oled.text("Back", 0, 0, 1)
+    oled.text(str(placeholder[alloy-1]), 0, 10) #show the content of chosen alloy
+    oled.show()
+    historyShow = True
+    while historyShow == True:
+        if button.onepress():
+            history_menu()
+            historyShow = False
+    
+            
 #defining stuff
+placeholder = [5, 2]
 rot = Encoder(10, 11)
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
 oled_width = 128
@@ -260,4 +372,4 @@ oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
 button = Button(12, Pin.IN, Pin.PULL_UP)
 
-main_menu()
+history_menu()
