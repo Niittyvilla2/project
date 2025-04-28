@@ -126,7 +126,7 @@ def bpm_start():
     oled.text("Start/Stop", 10, 54, 1)
     oled.text("Back", 10, 44, 1)
     oled.text("BPM: ", 10, 34, 1) #update bpm every 5 seconds
-    oled.fill_rect(0, 0, 128, 30, 1) #Place for live ppg
+    oled.fill_rect(0, 0, 128, 30, 1) #Import PPG and display here
     menu_cursor(44)
     oled.show()
     bpmStart = True
