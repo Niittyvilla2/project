@@ -123,11 +123,11 @@ def main_menu():
 
 def bpm_start():
     oled.fill(0)
-    oled.text("Start/Stop", 10, 0, 1)
-    oled.text("Back", 10, 10, 1)
-    oled.text("BPM: ", 10, 20, 1) #update bpm every 5 seconds
-    oled.fill_rect(0, 30, 128, 44, 1) #Place for live ppg
-    menu_cursor(0)
+    oled.text("Start/Stop", 10, 54, 1)
+    oled.text("Back", 10, 44, 1)
+    oled.text("BPM: ", 10, 34, 1) #update bpm every 5 seconds
+    oled.fill_rect(0, 0, 128, 30, 1) #Place for live ppg
+    menu_cursor(44)
     oled.show()
     bpmStart = True
     place = 0
@@ -137,10 +137,10 @@ def bpm_start():
             place += i
             if place <= 0:
                 place = 0
-                menu_cursor(0)
+                menu_cursor(54)
             elif place >= 1:
                 place = 1
-                menu_cursor(10)
+                menu_cursor(44)
         oled.show()
         if button.onepress():
             if place == 0:
