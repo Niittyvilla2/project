@@ -372,4 +372,4 @@ oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
 button = Button(12, Pin.IN, Pin.PULL_UP)
 
-history_menu()
+main_menu()
