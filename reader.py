@@ -10,8 +10,7 @@ class Reader:
         self.timer = Piotimer(period=4, mode=Piotimer.PERIODIC, callback=self.poll_data)
 
     def poll_data(self, tid):
-        data = int(self.data.value())
-        self.fifo.put(data)
+        self.fifo.put(int(self.data.value()))
 
     def read_next(self):
         return self.fifo.get()
