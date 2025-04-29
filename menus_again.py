@@ -7,6 +7,7 @@ from fifo import Fifo
 from PPG import PPG
 from hr import HR
 from reader import Reader
+from piotimer import Piotimer
 
 class Button(Pin):
     def __init__(self, *args, **kwargs):
@@ -375,6 +376,7 @@ placeholder = [5, 2]
 rot = Encoder(10, 11)
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
 reader = Reader(27)
+timer = Piotimer(period=4, mode=Piotimer.PERIODIC, callback=reader.poll_data)
 oled_width = 128
 oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
