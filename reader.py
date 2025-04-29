@@ -9,7 +9,7 @@ class Reader:
         self.data = Pin(pin, mode=Pin.IN)
         self.timer = Piotimer(period=4, mode=Piotimer.PERIODIC, callback=self.poll_data)
 
-    def poll_data(self):
+    def poll_data(self, tid):
         data = int(self.data.value())
         self.fifo.put(data)
 
