@@ -146,7 +146,6 @@ def bpm_start():
         oled.show()
         if button.onepress():
             if place == 0:
-                pass #Start/stop the method to mesure BPM
                 while button.pressed():
                     hrv_data = []
                     for _ in range(128*10):
