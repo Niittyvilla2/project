@@ -4,7 +4,9 @@ from machine import Pin, UART, I2C, Timer, ADC
 from ssd1306 import SSD1306_I2C
 import time
 from fifo import Fifo
-
+from PPG import PPG
+from hr import HR
+from reader import Reader
 
 class Button(Pin):
     def __init__(self, *args, **kwargs):
@@ -126,7 +128,7 @@ def bpm_start():
     oled.text("Start/Stop", 10, 54, 1)
     oled.text("Back", 10, 44, 1)
     oled.text("BPM: ", 10, 34, 1) #update bpm every 5 seconds
-    oled.fill_rect(0, 0, 128, 30, 1) #Import PPG graph and display here
+    #oled.fill_rect(0, 0, 127, 30, 1) #Import PPG graph and display here
     menu_cursor(44)
     oled.show()
     bpmStart = True
@@ -145,6 +147,11 @@ def bpm_start():
         if button.onepress():
             if place == 0:
                 pass #Start/stop the method to mesure BPM
+                while button.pressed():
+                    hrv_data = []
+                    for _ in range(128*10):
+                        hrv_data.append(reader.read_next())
+                    ppg.draw(hrv_data)
             if place == 1:
                 main_menu()
                 bpmStart = False
@@ -367,9 +374,11 @@ def history_show(alloy):
 placeholder = [5, 2]
 rot = Encoder(10, 11)
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
+reader = Reader(27)
 oled_width = 128
 oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
+ppg = PPG(oled, 0, 0, 127, 30, 10)
 button = Button(12, Pin.IN, Pin.PULL_UP)
 
 main_menu()
