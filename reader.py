@@ -5,7 +5,7 @@ from piotimer import Piotimer
 
 class Reader:
     def __init__(self, pin):
-        self.fifo = Fifo(333, typecode='i')
+        self.fifo = Fifo(2500, typecode='i')
         self.data = ADC(Pin(27))
         self.tmr = None
         self.timer()
@@ -20,4 +20,4 @@ class Reader:
         return self.fifo.has_data()
 
     def timer(self):
-        self.tmr = Piotimer(period=10, mode=Piotimer.PERIODIC, callback=self.poll_data)
+        self.tmr = Piotimer(period=4, mode=Piotimer.PERIODIC, callback=self.poll_data)
