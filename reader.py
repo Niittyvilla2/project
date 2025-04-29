@@ -8,7 +8,6 @@ class Reader:
         self.fifo = Fifo(2500, typecode='i')
         self.data = ADC(Pin(27))
         self.tmr = None
-        self.timer()
 
     def poll_data(self, tid):
         self.fifo.put(int(self.data.read_u16()))
@@ -19,5 +18,8 @@ class Reader:
     def has_data(self):
         return self.fifo.has_data()
 
-    def timer(self):
+    def start(self):
         self.tmr = Piotimer(period=4, mode=Piotimer.PERIODIC, callback=self.poll_data)
+
+    def stop(self):
+        self.tmr.deinit()
