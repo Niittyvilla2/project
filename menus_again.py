@@ -151,7 +151,8 @@ def bpm_start():
                     hrv_data = []
                     for _ in range(128*10):
                         hrv_data.append(reader.read_next())
-                    ppg.draw(hrv_data)
+                    ppg.plot(hrv_data)
+                    oled.show()
             if place == 1:
                 main_menu()
                 bpmStart = False

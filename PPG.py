@@ -15,7 +15,7 @@ class PPG:
         self.xMax = xMax
         self.squish = squish
             
-    def adjust(self, y):
+    def plot(self, y):
         y -= self.offset
         y /= self.scale / self.yMax
         y = int(y)
@@ -33,7 +33,7 @@ class PPG:
             show.append(a/self.squish)
         self.setScale(show)
         self.setOffset(show)
-        self.screen.fill(0)
+        self.screen.fill_rect(self.xMin, self.yMin, self.xMax, self.yMax, 0)
         x = 1
         prev = show[0]
         for y in show[1:127]:
@@ -41,7 +41,6 @@ class PPG:
             self.screen.line(x-1, prev, x, y, 1)
             prev = y
             x += 1
-        self.screen.show()
 
     def setScale(self, list):
         high = list[0]
