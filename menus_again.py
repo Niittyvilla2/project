@@ -147,12 +147,18 @@ def bpm_start():
         oled.show()
         if button.onepress():
             if place == 0:
-                while button.pressed():
-                    hrv_data = []
-                    for _ in range(128*10):
-                        hrv_data.append(reader.read_next())
-                    ppg.plot(hrv_data)
+                collect = True
+                reader.start()
+                hrv_data = []
+                while collect:
+                    hrv_data.append(reader.read_next())
+                    if len(hrv_data) > 128*10+1:
+                        hrv_data.pop(0)
+                    if len(hrv_data) > 128*10-1:
+                        ppg.plot(hrv_data)
                     oled.show()
+                    if button.onepress():
+                        collect = False
             if place == 1:
                 main_menu()
                 bpmStart = False

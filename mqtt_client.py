@@ -1,19 +1,21 @@
 from umqtt.simple import MQTTClient
 import json
-import time
 
 # MQTT settings
 MQTT_BROKER = "hrm02.asuscomm.com"
 MQTT_PORT = 1883
 TOPIC_RRI = "kubios-request"
 
-def upload_rr_intervals(rr_intervals):
+def upload_rr_intervals(timestamp, rr_intervals):
+    MQTT_BROKER = "hrm02.asuscomm.com"
+    MQTT_PORT = 1883
+    TOPIC_RRI = "kubios-request"
     try:
         client = MQTTClient(client_id="hrva3000", server=MQTT_BROKER, port=MQTT_PORT)
         client.connect()
 
         payload = {
-            "id": int(time.time()),  # Unique ID from current time
+            "id": timestamp,  # Unique ID from current time
             "type": "RRI",
             "data": rr_intervals,  # This should be a list of ints
             "analysis": {

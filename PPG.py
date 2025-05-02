@@ -32,8 +32,8 @@ class PPG:
                 a += points[i]
                 i += 1
             show.append(a / self.squish)
-        self.setScale(show)
-        self.setOffset(show)
+        self.set_scale(show)
+        self.set_offset(show)
         self.screen.fill_rect(self.xMin, self.yMin, self.xMax, self.yMax, 0)
         x = 1
         prev = self.adjust(show[0])
@@ -43,7 +43,7 @@ class PPG:
             prev = y
             x += 1
 
-    def setScale(self, list):
+    def set_scale(self, list):
         high = list[0]
         low = high
         for i in list:
@@ -55,7 +55,7 @@ class PPG:
         if scale > self.scale:
             self.scale = scale
 
-    def setOffset(self, list):
+    def set_offset(self, list):
         low = list[0]
         for i in list:
             if i < low:
