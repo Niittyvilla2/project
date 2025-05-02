@@ -55,8 +55,13 @@ class HR:
 
         while True:
             if self.reader.has_data():
-                self.next = self.reader.read_next()
-                self.ppg_points.append(self.next)
+                i = 0
+                for _ in range(self.squish):
+                    data = self.reader.read_next()
+                    i += data
+                data = i / self.squish
+                self.data.append(data)
+                self.ppg_points.append(data)
                 amplitude_diff = abs(self.curr - self.prev) + abs(self.curr - self.next)
 
                 if self.calibration != None:
