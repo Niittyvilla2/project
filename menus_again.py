@@ -8,6 +8,8 @@ from PPG import PPG
 from hr import HR
 from reader import Reader
 from piotimer import Piotimer
+from manager import Manager
+import micropython
 
 
 class Button(Pin):
@@ -149,25 +151,27 @@ def bpm_start():
         if button.onepress():
             if place == 0:
                 collect = True
-                reader.start(4)
-                squish = 4
-                hrv_data = []
-                time.sleep(0.125)
+                hr.hr.reader.start(4)
+                hr.hr.set_show_ppg(True)
+                hr.hr.set_squish(5)
+                time.sleep(.5)
+                refresh = 0
+                intervals = []
+                bpm = 0
                 while collect:
-                    for _ in range(24):
-                        if reader.has_data():
-                            read = reader.read_next()
-                            hrv_data.append(read)
-                            print(read)
-                        if len(hrv_data) > 128 * squish + 1:
-                            hrv_data.pop(0)
-                    if len(hrv_data) > 128 * squish - 1:
-                        ppg.plot(hrv_data, squish)
-                    oled.show()
                     if button.onepress():
                         collect = False
-                        reader.stop()
-                        
+                        hr.hr.reader.stop()
+                        print('Stopped')
+                    interval = hr.collect_hr()
+                    print('interval ' + str(interval))
+                    intervals.append(interval)
+                    refresh += 1
+                    if len(intervals) > 5 and refresh > 5:
+                        oled.text(str(bpm), 50, 34, 0)
+                        bpm = hr.calculate_hr()
+                        oled.text(str(bpm), 50, 34, 1)
+                        refresh = 0
             if place == 1:
                 main_menu()
                 bpmStart = False
@@ -403,6 +407,7 @@ def history_show(alloy):
 
 
 # defining stuff
+micropython.alloc_emergency_exception_buf(200)
 placeholder = [5, 2]
 rot = Encoder(10, 11)
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
@@ -411,6 +416,7 @@ oled_width = 128
 oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
 ppg = PPG(oled, 0, 0, 127, 30)
+hr = Manager(ppg)
 button = Button(12, Pin.IN, Pin.PULL_UP)
 
 main_menu()
