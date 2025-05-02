@@ -60,5 +60,5 @@ class PPG:
         for i in list:
             if i < low:
                 low = i
-        if low > self.offset:
+        if low < self.offset:
             self.offset = low
