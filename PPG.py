@@ -33,7 +33,7 @@ class PPG:
             squished = a / squish
             show.append(squished)
         self.setScale(show)
-        self.setOffset(show)
+        #self.setOffset(show)
         self.screen.fill_rect(self.xMin, self.yMin, self.xMax, self.yMax, 0)
         x = 1
         prev = self.adjust(show[0])
@@ -54,6 +54,7 @@ class PPG:
         scale = high - low
         if scale > self.scale:
             self.scale = scale
+            self.offset = low
 
     def setOffset(self, list):
         low = list[0]

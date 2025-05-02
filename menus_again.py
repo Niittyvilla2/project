@@ -149,8 +149,8 @@ def bpm_start():
         if button.onepress():
             if place == 0:
                 collect = True
-                reader.start(4)
-                squish = 5
+                reader.start(5)
+                squish = 3
                 hrv_data = []
                 time.sleep(0.125)
                 while collect:
@@ -165,6 +165,7 @@ def bpm_start():
                     if button.onepress():
                         collect = False
                         reader.stop()
+                        
             if place == 1:
                 main_menu()
                 bpmStart = False
@@ -209,15 +210,26 @@ def hrv_mesuring():
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
-    # Progressbar?
-    # gather data for 30s then analyze and save the gathered data here or in diffrent method, also save the timestamp
-    # show "Analysis compleate" for 5 or so seconds after the previous step is complete before moving to hrv_results
     hrvMesure = True
     while hrvMesure == True:
-        if button.onepress():
-            # stop mesurment and dont save it
-            hrv_start()
-            hrvMesure = False
+            collect = True
+            reader.start(5)
+            squish = 3
+            hrv_data = []
+            time.sleep(0.125)
+            while collect:
+                read = reader.read_next()
+                hrv_data.append(read)
+                print(read)
+                oled.show()
+                if button.onepress():
+                    reader.stop()
+                    collect = False
+                    oled.fill(0)
+                    oled.text("Mesuring stopped",0, 20, 1)
+                    oled.show()
+                    time.sleep(3)
+                    hrv_start()
 
 
 def hrv_results():
