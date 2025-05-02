@@ -18,8 +18,8 @@ class Reader:
     def has_data(self):
         return self.fifo.has_data()
 
-    def start(self):
-        self.tmr = Piotimer(period=4, mode=Piotimer.PERIODIC, callback=self.poll_data)
+    def start(self, interval):
+        self.tmr = Piotimer(period=interval, mode=Piotimer.PERIODIC, callback=self.poll_data)
 
     def stop(self):
         self.tmr.deinit()
