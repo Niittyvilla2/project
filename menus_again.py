@@ -149,16 +149,18 @@ def bpm_start():
         if button.onepress():
             if place == 0:
                 collect = True
-                reader.start(5)
-                squish = 3
+                reader.start(4)
+                squish = 4
                 hrv_data = []
                 time.sleep(0.125)
                 while collect:
-                    read = reader.read_next()
-                    hrv_data.append(read)
-                    print(read)
-                    if len(hrv_data) > 128 * squish + 1:
-                        hrv_data.pop(0)
+                    for _ in range(24):
+                        if reader.has_data():
+                            read = reader.read_next()
+                            hrv_data.append(read)
+                            print(read)
+                        if len(hrv_data) > 128 * squish + 1:
+                            hrv_data.pop(0)
                     if len(hrv_data) > 128 * squish - 1:
                         ppg.plot(hrv_data, squish)
                     oled.show()
