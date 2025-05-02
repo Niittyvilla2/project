@@ -40,6 +40,7 @@ class HR:
     def get_beat_interval(self):
         beat_interval = 1
         show_counter = 0
+        print(self.reader.fifo)
         if self.prev == 0 and self.curr == 0 and self.next == 0:
             while len(self.data) < 3:
                 i = 0
@@ -54,12 +55,13 @@ class HR:
             self.next = self.data[2]
 
         while True:
-            if self.reader.has_data():
+            if abs(self.reader.fifo.tail - self.reader.fifo.head) > self.squish:
                 i = 0
                 for _ in range(self.squish):
                     data = self.reader.read_next()
                     i += data
                 data = i / self.squish
+                self.next = data
                 self.data.append(data)
                 self.ppg_points.append(data)
                 amplitude_diff = abs(self.curr - self.prev) + abs(self.curr - self.next)
@@ -76,7 +78,7 @@ class HR:
                         self.data.append(self.prev)
                         self.data.append(self.curr)
                         self.data.append(self.next)
-                        return beat_interval * self.reader.interval
+                        return beat_interval * self.reader.interval * self.squish
 
                 if len(self.ppg_points) > 128 * self.squish + 1:
                     self.ppg_points.pop(0)
@@ -102,3 +104,4 @@ class HR:
 
     def set_show_ppg(self, value):
         self.show_ppg = value
+

@@ -8,9 +8,8 @@ from PPG import PPG
 from hr import HR
 from reader import Reader
 from piotimer import Piotimer
-from manager import Manager
 import micropython
-
+from manager import Manager
 
 class Button(Pin):
     def __init__(self, *args, **kwargs):
@@ -153,7 +152,8 @@ def bpm_start():
                 collect = True
                 hr.hr.reader.start(4)
                 hr.hr.set_show_ppg(True)
-                hr.hr.set_squish(5)
+                hr.hr.set_squish(2)
+                print(hr.hr.reader.fifo)
                 time.sleep(.5)
                 refresh = 0
                 intervals = []
@@ -216,26 +216,15 @@ def hrv_mesuring():
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
+    # Progressbar?
+    # gather data for 30s then analyze and save the gathered data here or in diffrent method, also save the timestamp
+    # show "Analysis compleate" for 5 or so seconds after the previous step is complete before moving to hrv_results
     hrvMesure = True
     while hrvMesure == True:
-            collect = True
-            reader.start(5)
-            squish = 3
-            hrv_data = []
-            time.sleep(0.125)
-            while collect:
-                read = reader.read_next()
-                hrv_data.append(read)
-                print(read)
-                oled.show()
-                if button.onepress():
-                    reader.stop()
-                    collect = False
-                    oled.fill(0)
-                    oled.text("Mesuring stopped",0, 20, 1)
-                    oled.show()
-                    time.sleep(3)
-                    hrv_start()
+        if button.onepress():
+            # stop mesurment and dont save it
+            hrv_start()
+            hrvMesure = False
 
 
 def hrv_results():
@@ -411,7 +400,6 @@ micropython.alloc_emergency_exception_buf(200)
 placeholder = [5, 2]
 rot = Encoder(10, 11)
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
-reader = Reader(27)
 oled_width = 128
 oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
@@ -420,3 +408,4 @@ hr = Manager(ppg)
 button = Button(12, Pin.IN, Pin.PULL_UP)
 
 main_menu()
+
