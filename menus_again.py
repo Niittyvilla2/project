@@ -150,16 +150,17 @@ def bpm_start():
             if place == 0:
                 collect = True
                 reader.start(4)
+                squish = 5
                 hrv_data = []
                 time.sleep(0.125)
                 while collect:
                     read = reader.read_next()
                     hrv_data.append(read)
                     print(read)
-                    if len(hrv_data) > 128 * 10 + 1:
+                    if len(hrv_data) > 128 * squish + 1:
                         hrv_data.pop(0)
-                    if len(hrv_data) > 128 * 10 - 1:
-                        ppg.plot(hrv_data)
+                    if len(hrv_data) > 128 * squish - 1:
+                        ppg.plot(hrv_data, squish)
                     oled.show()
                     if button.onepress():
                         collect = False
@@ -395,7 +396,7 @@ reader = Reader(27)
 oled_width = 128
 oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
-ppg = PPG(oled, 0, 0, 127, 30, 10)
+ppg = PPG(oled, 0, 0, 127, 30)
 button = Button(12, Pin.IN, Pin.PULL_UP)
 
 main_menu()

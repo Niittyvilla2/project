@@ -6,7 +6,7 @@ from piotimer import Piotimer
 
 
 class PPG:
-    def __init__(self, screen, xMin, yMin, xMax, yMax, squish):
+    def __init__(self, screen, xMin, yMin, xMax, yMax,):
         self.screen = screen
         self.scale = 0
         self.offset = 0
@@ -14,7 +14,6 @@ class PPG:
         self.xMin = xMin
         self.yMax = yMax
         self.xMax = xMax
-        self.squish = squish
 
     def adjust(self, y):
         y -= self.offset
@@ -23,16 +22,16 @@ class PPG:
         y = 29 - y
         return y
 
-    def plot(self, points):
+    def plot(self, points, squish):
         show = []
         i = 0
-        for _ in range(len(points) / self.squish - 1):
+        for _ in range(len(points) / squish - 1):
             a = 0
-            for _ in range(self.squish):
+            for _ in range(squish):
                 a += points[i]
                 i += 1
-            squished = a / self.squish
-            show.append(a / self.squish)
+            squished = a / squish
+            show.append(squished)
         self.setScale(show)
         self.setOffset(show)
         self.screen.fill_rect(self.xMin, self.yMin, self.xMax, self.yMax, 0)
