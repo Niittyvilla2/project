@@ -1,20 +1,22 @@
-from datetime import time
 from umqtt.simple import MQTTClient
 import json
+
 
 from hr import HR
 
 class Manager:
-    def __init__(self):
-        self.hr = HR()
+    def __init__(self, ppg):
+        self.hr = HR(ppg)
         self.intervals = []
         self.collecting = False
         self.timeStart = None
         self.timeEnd = None
         self.minIntervals = 30
 
-    def collect_hr(self, interval):
+    def collect_hr(self):
+        interval = self.hr.get_beat_interval()
         self.intervals.append(interval)
+        return interval
 
     def collect_start(self):
         self.timeStart = time()
@@ -23,8 +25,22 @@ class Manager:
     def collect_end(self):
         self.timeEnd = time()
         self.collecting = False
-        if len(self.intervals) > self.minIntervals:
-            self.send_data()
+        #if len(self.intervals) > self.minIntervals:
+            #self.send_data()
+    def calculate_hr(self):
+        a = 0
+        if len(self.intervals) > 5:
+            a += self.intervals[len(self.intervals) - 5]
+            a += self.intervals[len(self.intervals) - 4]
+            a += self.intervals[len(self.intervals) - 3]
+            a += self.intervals[len(self.intervals) - 2]
+            a += self.intervals[len(self.intervals) - 1]
+            a = a/5
+            b = 60*(1000/a)
+            b = round(b, 1)
+            return b
+        else:
+            return None
 
     def send_data(self):
         MQTT_BROKER = "hrm02.asuscomm.com"
