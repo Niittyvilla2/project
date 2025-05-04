@@ -34,14 +34,10 @@ class Analysis:
         timestamp = date
         
         mesurment = {
-            "mean_hr":mean_hr,
-            "mean_ppi": mean_ppi,
-            "rmssd": rmssd,
-            "sdnn": sdnn,
+            "mean_hr":round(mean_hr,2),
+            "mean_ppi": round(mean_ppi,2),
+            "rmssd": round(rmssd,2),
+            "sdnn": round(sdnn,2),
             "timestamp": timestamp
             }
         return mesurment
-    
-analysis = Analysis()
-mesure = analysis.calculate()
-print(mesure)
