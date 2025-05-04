@@ -16,7 +16,7 @@ class HR:
         self.show_ppg = False
         self.ppg = ppg
         self.ppg_points = []
-        self.squish = 3
+        self.squish = 2
 
     def calibrate(self):
         mean_val = sum(self.calibration_data) / len(self.calibration_data)
