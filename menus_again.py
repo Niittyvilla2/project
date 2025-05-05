@@ -10,6 +10,7 @@ from reader import Reader
 from piotimer import Piotimer
 import micropython
 from manager import Manager
+from hrv_analysis import Analysis
 
 class Button(Pin):
     def __init__(self, *args, **kwargs):
@@ -79,7 +80,17 @@ def kubios_cursor(place):
     oled.fill_rect(60, 56, 10, 64, 0)
     oled.text(">", place, 56, 1)
 
-
+def progressbar():
+    oled.rect(8, 50, 108, 12, 1)
+    oled.fill_rect(10,52,0,8,1)
+    oled.show()
+    lenght = 0
+    for _ in range(30):
+        lenght += 104/30
+        oled.fill_rect(10,52,int(lenght),8,1)
+        oled.show()
+        time.sleep(1)
+        
 def main_menu():
     # menu UI
     oled.fill(0)
@@ -216,29 +227,33 @@ def hrv_mesuring():
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
-    # Progressbar?
-    # gather data for 30s then analyze and save the gathered data here or in diffrent method, also save the timestamp
-    # show "Analysis compleate" for 5 or so seconds after the previous step is complete before moving to hrv_results
+    timer.init(mode=Timer.ONE_SHOT, period=30000, callback=hrv_results)
+    progressbar()
     hrvMesure = True
     while hrvMesure == True:
         if button.onepress():
-            # stop mesurment and dont save it
+            oled.fill(0)
+            oled.text("Mesurment", 0, 20, 1)
+            oled.text("stopped", 0, 30, 1)
+            oled.show()
+            time.sleep(3)
             hrv_start()
             hrvMesure = False
 
 
-def hrv_results():
+def hrv_results(tid):
     oled.fill(0)
-    # display mean PPI, mean HR, RMSSD and SDNN
-    oled.text("Mean PPI", 0, 0, 1)
-    oled.text("Mean HR", 0, 10, 1)
-    oled.text("RMSDD", 0, 20, 1)
-    oled.text("SDNN", 0, 30, 1)
+    values = analysis.calculate()
+    oled.text("Mean PPI: " + str(values["mean_ppi"]), 0, 0, 1)
+    oled.text("Mean HR: " + str(values["mean_hr"]), 0, 10, 1)
+    oled.text("RMSSD: " + str(values["rmssd"]), 0, 20, 1)
+    oled.text("SDNN: " + str(values["sdnn"]), 0, 30, 1)
     oled.text("Back", 10, 56, 1)
     hrv_cursor(0)
     oled.show()
     hrvResults = True
     while hrvResults == True:
+        
         if button.onepress():
             hrv_start()
             hrvResults = False
@@ -406,6 +421,8 @@ oled = SSD1306_I2C(oled_width, oled_height, i2c)
 ppg = PPG(oled, 0, 0, 127, 30)
 hr = Manager(ppg)
 button = Button(12, Pin.IN, Pin.PULL_UP)
+analysis = Analysis()
+timer = Timer()
 
-main_menu()
+hrv_start()
 
