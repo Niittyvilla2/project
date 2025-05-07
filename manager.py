@@ -175,11 +175,13 @@ class Manager:
 
     def save_history(self, response):
         name = '/history/' + response['id'] + '.json'
-        if os.path.exists(name):
+        try:
+            os.stat(name)
+            with open(name, 'w') as json_file:
+                ujson.dump(response, json_file)
+        except OSError:
             print("History file already exists")
             return
-        with open(name, 'w') as json_file:
-            ujson.dump(response, json_file)
 
     def read_history(self, file):
         with open(file, 'r') as json_file:
