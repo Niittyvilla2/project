@@ -62,6 +62,31 @@ class Encoder:
         else:
             self.fifo.put(1)
 
+class Progressbar:
+    def __init__(self, screen):
+        self.prog = 0
+        self.max = 120
+        self.screen = screen
+        self.timer = None
+
+    def progress(self):
+        self.prog += 4
+        if self.prog > self.max:
+            self.stop()
+            return
+        self.screen.fill_rect(4, 52, self.prog, 8, 1)
+
+    def stop(self):
+        self.timer.deinit()
+        self.prog = 0
+
+    def start(self):
+        self.prog = 0
+        self.timer = Piotimer(period=1000, mode=Piotimer.PERIODIC, callback=self.progress)
+        self.screen.rect(2, 50, 124, 12, 1)
+        self.screen.fill_rect(4, 52, 1, 8, 1)
+
+
 
 def menu_cursor(place):
     oled.fill_rect(0, 0, 10, 64, 0)
@@ -78,17 +103,6 @@ def kubios_cursor(place):
     oled.fill_rect(0, 56, 10, 64, 0)
     oled.fill_rect(60, 56, 10, 64, 0)
     oled.text(">", place, 56, 1)
-
-def progressbar():
-    prog = 0
-    def progress(tid):
-        nonlocal prog
-        prog += 4
-        oled.fill_rect(4, 52, prog, 8, 1)
-    oled.rect(2, 50, 124, 12, 1)
-    oled.fill_rect(4,52,1,8,1)
-    oled.show()
-    timer = Piotimer(period=1000, mode=Piotimer.PERIODIC, callback=progress)
         
 def main_menu():
     # menu UI
@@ -218,7 +232,7 @@ def hrv_mesuring():
     oled.text("stop early.", 0, 20, 1)
     oled.show()
     timer.init(mode=Timer.ONE_SHOT, period=30000, callback=hrv_results)
-    progressbar()
+    bar.start()
     manager.collect_start()
     manager.hr.reader.start(4)
     time.sleep(.5)
@@ -227,11 +241,13 @@ def hrv_mesuring():
         manager.collect_hr()
         oled.show()
         if button.onepress():
-            manager.hr.reader.stop()
             oled.fill(0)
             oled.text("Mesurment", 0, 20, 1)
             oled.text("stopped", 0, 30, 1)
             oled.show()
+            timer.deinit()
+            bar.stop()
+            manager.hr.reader.stop()
             time.sleep(3)
             hrvMesure = False
             hrv_start()
@@ -239,9 +255,9 @@ def hrv_mesuring():
 
 def hrv_results(tid):
     oled.fill(0)
+    bar.stop()
     manager.collect_end()
     values = manager.calculate()
-    oled.fill(0)
     hrv_cursor(0)
     oled.text(f"Mean PPI {values['mean_ppi']}", 0, 0, 1)
     oled.text(f"Mean HR {values['mean_hr']}", 0, 9, 1)
@@ -301,7 +317,7 @@ def kubios_mesuring():
     timer.init(mode=Timer.ONE_SHOT, period=30000, callback=kubios_results)
     manager.hr.reader.start(4)
     time.sleep(.5)
-    progressbar()
+    bar.start()
     # Progressbar?
     # gather data for 30s
     # send and recive data from Kubios, save mesurment with timestamp
@@ -316,12 +332,15 @@ def kubios_mesuring():
             # stop mesurment and dont save it
             manager.kubios = False
             kubiosMesure = False
+            bar.stop()
+            timer.deinit()
             manager.collect_end()
             kubios_start()
 
 
 def kubios_results(tid):
     oled.fill(0)
+    bar.stop()
     manager.hr.reader.stop()
     manager.collect_end()
     # display kubios data
@@ -332,7 +351,6 @@ def kubios_results(tid):
     oled.text("Waiting results", 0, 0, 1)
     oled.text("Please wait", 0, 9, 1)
     oled.show()
-    progressbar()
     for a in range(30):
         time.sleep(.5)
         print(a)
@@ -458,6 +476,7 @@ i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
 oled_width = 128
 oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
+bar = Progressbar(oled)
 ppg = PPG(oled, 0, 0, 127, 30)
 manager = Manager(ppg)
 button = Button(12, Pin.IN, Pin.PULL_UP)
