@@ -179,6 +179,8 @@ class Manager:
             os.stat(name)
             with open(name, 'w') as json_file:
                 ujson.dump(response, json_file)
+            print("History saved")
+            return
         except OSError:
             print("History file already exists")
             return
