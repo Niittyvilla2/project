@@ -327,19 +327,18 @@ def kubios_results(tid):
     kubios_cursor(0)
     oled.show()
     kubiosResults = True
-    waiting = True
+    oled.fill(0)
+    oled.text("Waiting results", 0, 0, 1)
+    oled.text("Please wait", 0, 9, 1)
+    oled.show()
+    progressbar()
+    for a in range(30):
+        time.sleep(.5)
+        print(a)
+        oled.show()
+    data = manager.get_data()
+    print("TEST")
     while kubiosResults == True:
-        while waiting == True:
-            oled.fill(0)
-            oled.text("Waiting results", 0, 0, 1)
-            oled.text("Please wait", 0, 9, 1)
-            oled.show()
-            time.sleep(1)
-            print("test")
-            time.sleep(1)
-            data = manager.get_data()
-            print("TEST")
-            waiting = False
         oled.fill(0)
         oled.text(f"Mean PPI:{data['data']['mean_rr_ms']}", 0, 0, 1)
         oled.text(f"Mean HR:{data['data']['mean_hr_bpm']:.2f}", 0, 9, 1)

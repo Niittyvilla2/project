@@ -57,6 +57,7 @@ class Manager:
 
     def collect_end(self):
         self.collecting = False
+        self.hr.reader.stop()
         if len(self.intervals) > self.minIntervals and self.kubios:
             self.send_data()
 
@@ -143,7 +144,7 @@ class Manager:
         client.connect()
         client.subscribe(self.mqtt_topic_response)
         while message is None:
-            client.wait_msg()
+            client.check_msg()
         client.disconnect()
         self.save_history(message)
         return message
