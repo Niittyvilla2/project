@@ -273,7 +273,7 @@ def hrv_results(tid):
     oled.text("Back", 10, 56, 1)
     oled.show()
     hrvResults = True
-    manager.save_history(values)
+    manager.save_local(values)
     while hrvResults == True:
         if button.onepress():
             hrvResults = False

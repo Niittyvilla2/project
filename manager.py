@@ -174,7 +174,7 @@ class Manager:
         return history_list
 
     def save_history(self, response):
-        name = '/' + response['id'] + '.json'
+        name = '/history/' + response['id'] + '.json'
         if os.path.exists(name):
             print("History file already exists")
             return
