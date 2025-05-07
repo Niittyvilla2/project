@@ -173,8 +173,9 @@ def bpm_start():
                     print('interval ' + str(interval))
                     manager.calculate_hr()
             if place == 1:
-                main_menu()
+                manager.hr.set_show_ppg(False)
                 bpmStart = False
+                main_menu()
 
 
 def hrv_start():
@@ -226,11 +227,11 @@ def hrv_mesuring():
         manager.collect_hr()
         oled.show()
         if button.onepress():
+            manager.hr.reader.stop()
             oled.fill(0)
             oled.text("Mesurment", 0, 20, 1)
             oled.text("stopped", 0, 30, 1)
             oled.show()
-            manager.hr.reader.stop()
             time.sleep(3)
             hrvMesure = False
             hrv_start()
@@ -240,6 +241,7 @@ def hrv_results(tid):
     oled.fill(0)
     manager.collect_end()
     values = manager.calculate()
+    oled.fill(0)
     hrv_cursor(0)
     oled.text(f"Mean PPI {values['mean_ppi']}", 0, 0, 1)
     oled.text(f"Mean HR {values['mean_hr']}", 0, 9, 1)
@@ -332,6 +334,9 @@ def kubios_results(tid):
             oled.text("Waiting results", 0, 0, 1)
             oled.text("Please wait", 0, 9, 1)
             oled.show()
+            time.sleep(1)
+            print("test")
+            time.sleep(1)
             data = manager.get_data()
             print("TEST")
             waiting = False
