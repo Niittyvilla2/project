@@ -47,6 +47,7 @@ class Manager:
         interval = self.hr.get_beat_interval()
         if 315 < interval < 1400:
             self.intervals.append(interval)
+            print(interval)
         return interval
 
     def collect_start(self):
@@ -76,6 +77,9 @@ class Manager:
             self.bpm = b
         self.screen.text(str(self.bpm), 50, 34, 1)
         self.screen.show()
+        if len(self.intervals) > 200:
+            for _ in self.intervals[0:len(self.intervals)-6]:
+                self.intervals.pop()
 
     def connect_mqtt(self):
         try:
@@ -112,6 +116,7 @@ class Manager:
     def calculate(self):
         #ppi = [5, 3, 5, 6]  # list of ppi's
         #hr = [5, 3, 5, 6]  # list of hr's
+        print('starting calc')
         mean_ppi = sum(self.intervals) / len(self.intervals)
         mean_hr = 60000 / mean_ppi
         i = 0
@@ -131,8 +136,9 @@ class Manager:
             i += 1
         rmssd = math.sqrt(p / (i - 1))
         time = self.rtc.datetime()
-        date = str(time[0]) + "/" + str(time[1]) + "/" + str(time[2]) + " " + str(time[4]) + "." + str(time[5])
+        date = str(time[0]) + "/" + str(time[1]) + "/" + str(time[2]) + " " + str(time[4]) + str(time[5])
         timestamp = date
+        self.intervals.clear()
 
         mesurment = {
             "mean_hr": round(mean_hr, 2),
@@ -178,3 +184,14 @@ class Manager:
     def read_history(self, file):
         with open(file, 'r') as json_file:
             return ujson.load(json_file)
+
+    def save_local(self, measurements):
+        analysis = {'mean_rr_ms': measurements['mean_ppi'],
+                    'mean_hr_bpm': measurements['mean_hr'],
+                    'rmssd_ms': measurements['rmssd'],
+                    'sdnn_ms': measurements['sdnn'],
+                    'sns_index': 0.00,
+                    'stress_index': 0.00}
+        data = {'analysis': analysis}
+        json = {'id': measurements['timestamp'], 'data': data}
+        self.save_history(json)
