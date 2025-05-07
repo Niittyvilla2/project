@@ -240,7 +240,7 @@ def hrv_mesuring():
     while hrvMesure == True:
         manager.collect_hr()
         oled.show()
-        if button.onepress() or len(manager.intervals) > 35:
+        if button.onepress() or len(manager.intervals) >= 35:
             timer.deinit()
             bar.stop()
             manager.hr.reader.stop()
@@ -262,6 +262,8 @@ def hrv_results(tid):
     bar.stop()
     manager.collect_end()
     values = manager.calculate()
+    oled.show()
+    oled.fill(0)
     hrv_cursor(0)
     oled.text(f"Mean PPI {values['mean_ppi']}", 0, 0, 1)
     oled.text(f"Mean HR {values['mean_hr']}", 0, 9, 1)
@@ -271,6 +273,7 @@ def hrv_results(tid):
     oled.text("Back", 10, 56, 1)
     oled.show()
     hrvResults = True
+    manager.save_history(values)
     while hrvResults == True:
         if button.onepress():
             hrvResults = False
@@ -363,12 +366,12 @@ def kubios_results(tid):
     print("TEST")
     while kubiosResults == True:
         oled.fill(0)
-        oled.text(f"Mean PPI:{data['data']['mean_rr_ms']}", 0, 0, 1)
-        oled.text(f"Mean HR:{data['data']['mean_hr_bpm']:.2f}", 0, 9, 1)
-        oled.text(f"RMSSD:{data['data']['rmssd_ms']:.2f}", 0, 19, 1)
-        oled.text(f"SDNN:{data['data']['sdnn_ms']:.2f}", 0, 28, 1)
-        oled.text(f"SNS:{data['data']['sns_index']:.2f}", 0, 37, 1)
-        oled.text(f"PNS:{data['data']['stress_index']:.2f}", 0, 46, 1)
+        oled.text(f"Mean PPI:{data['data']['analysis']['mean_rr_ms']}", 0, 0, 1)
+        oled.text(f"Mean HR:{data['data']['analysis']['mean_hr_bpm']:.2f}", 0, 9, 1)
+        oled.text(f"RMSSD:{data['data']['analysis']['rmssd_ms']:.2f}", 0, 19, 1)
+        oled.text(f"SDNN:{data['data']['analysis']['sdnn_ms']:.2f}", 0, 28, 1)
+        oled.text(f"SNS:{data['data']['analysis']['sns_index']:.2f}", 0, 37, 1)
+        oled.text(f"PNS:{data['data']['analysis']['stress_index']:.2f}", 0, 46, 1)
         oled.text("Back", 10, 56, 1)
         menu_cursor(56)
         oled.show()
