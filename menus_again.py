@@ -71,10 +71,10 @@ class Progressbar:
 
     def progress(self, tid):
         self.prog += 4
-        if self.prog > self.max:
+        self.screen.fill_rect(4, 52, self.prog, 8, 1)
+        if self.prog == self.max:
             self.stop()
             return
-        self.screen.fill_rect(4, 52, self.prog, 8, 1)
 
     def stop(self):
         self.timer.deinit()
@@ -240,21 +240,25 @@ def hrv_mesuring():
     while hrvMesure == True:
         manager.collect_hr()
         oled.show()
-        if button.onepress():
-            oled.fill(0)
-            oled.text("Mesurment", 0, 20, 1)
-            oled.text("stopped", 0, 30, 1)
-            oled.show()
+        if button.onepress() or len(manager.intervals) > 35:
             timer.deinit()
             bar.stop()
             manager.hr.reader.stop()
-            time.sleep(3)
+            if len(manager.intervals) < 35:
+                oled.fill(0)
+                oled.text("Mesurment", 0, 20, 1)
+                oled.text("stopped", 0, 30, 1)
+                oled.show()
+                time.sleep(3)
+            else:
+                hrv_results()
             hrvMesure = False
             hrv_start()
 
 
 def hrv_results(tid):
     oled.fill(0)
+    timer.deinit()
     bar.stop()
     manager.collect_end()
     values = manager.calculate()
