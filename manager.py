@@ -143,7 +143,7 @@ class Manager:
         client.connect()
         client.subscribe(self.mqtt_topic_response)
         while message is None:
-            client.wait_msg()
+            client.check_msg()
         client.disconnect()
         self.save_history(message)
         return message
