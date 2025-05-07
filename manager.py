@@ -126,15 +126,21 @@ class Manager:
         return mesurment
 
     def get_data(self):
+        message = None
+
+        def callback(topic, msg):
+            nonlocal message
+            message = msg
+
         client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
-        client.set_callback(self.save_history)
+        client.set_callback(callback)
         client.connect()
         client.subscribe(self.mqtt_topic_response)
-        try:
-            while True:
-                client.wait_msg()
-        finally:
-            client.disconnect()
+        while message is None:
+            client.wait_msg()
+        client.disconnect()
+        self.save_history(message)
+        return message
 
     def get_history(self):
         history_list = os.listdir("/history")
