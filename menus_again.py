@@ -300,6 +300,8 @@ def kubios_mesuring():
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
+    manager.hr.reader.start(4)
+    time.sleep(.5)
     progressbar()
     # Progressbar?
     # gather data for 30s
@@ -307,7 +309,10 @@ def kubios_mesuring():
     # save data
     # move to kubios_results
     kubiosMesure = True
+
     while kubiosMesure == True:
+        manager.collect_hr()
+        oled.show()
         if button.onepress():
             # stop mesurment and dont save it
             manager.kubios = False
