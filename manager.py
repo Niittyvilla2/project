@@ -179,7 +179,7 @@ class Manager:
         file = response['id'] + '.json'
         files = os.listdir(path)
         if not file in files:
-            with open(path + file, 'w') as json_file:
+            with open(path[1:len(path)] + file, 'w') as json_file:
                 ujson.dump(response, json_file)
             print("History saved")
         else:
