@@ -83,11 +83,10 @@ def progressbar():
     prog = 0
     def progress(tid):
         nonlocal prog
-        prog += 1
-        oled.fill_rect(10, 52, int(104 / 30 * prog - 1), 8, 1)
-        oled.show()
-    oled.rect(8, 50, 108, 12, 1)
-    oled.fill_rect(10,52,1,8,1)
+        prog += 4
+        oled.fill_rect(4, 52, prog, 8, 1)
+    oled.rect(2, 50, 124, 12, 1)
+    oled.fill_rect(4,52,1,8,1)
     oled.show()
     timer = Piotimer(period=1000, mode=Piotimer.PERIODIC, callback=progress)
         
@@ -225,6 +224,7 @@ def hrv_mesuring():
     hrvMesure = True
     while hrvMesure == True:
         manager.collect_hr()
+        oled.show()
         if button.onepress():
             oled.fill(0)
             oled.text("Mesurment", 0, 20, 1)
@@ -239,7 +239,7 @@ def hrv_mesuring():
 def hrv_results(tid):
     oled.fill(0)
     manager.collect_end()
-    data = manager.calculate()
+    values = manager.calculate()
     oled.text("Mean PPI:" + str(values["mean_ppi"]), 0, 10, 1)
     oled.text("Mean HR:" + str(values["mean_hr"]), 0, 10, 1)
     oled.text("RMSSD:" + str(values["rmssd"]), 0, 20, 1)
