@@ -300,6 +300,7 @@ def kubios_mesuring():
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
+    timer.init(mode=Timer.ONE_SHOT, period=30000, callback=kubios_results)
     manager.hr.reader.start(4)
     time.sleep(.5)
     progressbar()
@@ -321,7 +322,7 @@ def kubios_mesuring():
             kubios_start()
 
 
-def kubios_results():
+def kubios_results(tid):
     oled.fill(0)
     # display kubios data
     kubios_cursor(0)
