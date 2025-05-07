@@ -69,7 +69,7 @@ class Progressbar:
         self.screen = screen
         self.timer = None
 
-    def progress(self):
+    def progress(self, tid):
         self.prog += 4
         if self.prog > self.max:
             self.stop()
