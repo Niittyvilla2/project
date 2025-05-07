@@ -251,7 +251,7 @@ def hrv_mesuring():
                 oled.show()
                 time.sleep(3)
             else:
-                hrv_results()
+                hrv_results(0)
             hrvMesure = False
             hrv_start()
 
