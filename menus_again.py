@@ -84,8 +84,7 @@ def progressbar():
     def progress(tid):
         nonlocal prog
         prog += 1
-        length = 104 / 30 * prog - 1
-        oled.fill_rect(10, 52, int(length), 8, 1)
+        oled.fill_rect(10, 52, int(104 / 30 * prog - 1), 8, 1)
         oled.show()
     oled.rect(8, 50, 108, 12, 1)
     oled.fill_rect(10,52,1,8,1)
@@ -241,7 +240,7 @@ def hrv_results(tid):
     oled.fill(0)
     manager.collect_end()
     data = manager.calculate()
-    oled.text(f"Mean PPI:{data['data']['mean_rr_ms']}", 0, 0, 1)
+    oled.text("Mean PPI:" + str(values["mean_ppi"]), 0, 10, 1)
     oled.text("Mean HR:" + str(values["mean_hr"]), 0, 10, 1)
     oled.text("RMSSD:" + str(values["rmssd"]), 0, 20, 1)
     oled.text("SDNN:" + str(values["sdnn"]), 0, 30, 1)
@@ -287,10 +286,10 @@ def kubios_start():
         if button.onepress():
             if place == 0:
                 kubiosStart = False
-                main_menu()
+                kubios_mesuring()
             if place == 1:
                 kubiosStart = False
-                kubios_mesuring()
+                main_menu()
 
 
 def kubios_mesuring():
