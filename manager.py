@@ -4,7 +4,6 @@ import json
 from machine import RTC
 import math
 from hr import HR
-from datetime import datetime
 import time
 import os
 import ujson
@@ -27,6 +26,7 @@ class Manager:
         self.connect_wifi()
         self.bpm = 0
         self.kubios = False
+        self.rct = RCT
         if not self.history_dir():
             os.mkdir("/history")
 
@@ -50,7 +50,7 @@ class Manager:
         return interval
 
     def collect_start(self):
-        time = datetime.now()
+        time = self.rtc.datetime()
         self.timeStart = time.strftime('%y-%m-%d-%H:%M')
         self.intervals.clear()
         self.collecting = True
