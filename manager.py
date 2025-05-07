@@ -35,7 +35,8 @@ class Manager:
         wlan.active(True)
         wlan.connect(self.wifi_ssid, self.wifi_password)
         while not wlan.isconnected():
-            time.sleep(1)
+            print('wifi retry')
+            time.sleep(3)
 
     def history_dir(self):
         try:
@@ -174,16 +175,15 @@ class Manager:
         return history_list
 
     def save_history(self, response):
-        name = '/history/' + response['id'] + '.json'
-        try:
-            os.stat(name)
-            print("History file already exists")
-            return
-        except AttributeError:
-            with open(name, 'w') as json_file:
+        path = '/history/'
+        file = response['id'] + '.json'
+        files = os.listdir(path)
+        if not file in files:
+            with open(path + file, 'w') as json_file:
                 ujson.dump(response, json_file)
             print("History saved")
-            return
+        else:
+            print("History already exists")
 
     def read_history(self, file):
         with open(file, 'r') as json_file:
