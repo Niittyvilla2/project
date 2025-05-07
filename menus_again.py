@@ -80,16 +80,18 @@ def kubios_cursor(place):
     oled.fill_rect(60, 56, 10, 64, 0)
     oled.text(">", place, 56, 1)
 
-def progressbar():
-    oled.rect(8, 50, 108, 12, 1)
-    oled.fill_rect(10,52,0,8,1)
-    oled.show()
-    lenght = 0
-    for _ in range(30):
-        lenght += 104/30
-        oled.fill_rect(10,52,int(lenght),8,1)
+def progressbar(tid):
+    prog = 0
+    def progress(tid):
+        nonlocal prog
+        prog += 1
+        length = 104 / 30 * prog - 1
+        oled.fill_rect(10, 52, int(length), 8, 1)
         oled.show()
-        time.sleep(1)
+    oled.rect(8, 50, 108, 12, 1)
+    oled.fill_rect(10,52,1,8,1)
+    oled.show()
+    timer = Piotimer(period=1000, mode=Piotimer.PERIODIC, callback=progress)
         
 def main_menu():
     # menu UI
@@ -163,12 +165,7 @@ def bpm_start():
                 collect = True
                 hr.hr.reader.start(4)
                 hr.hr.set_show_ppg(True)
-                hr.hr.set_squish(2)
-                print(hr.hr.reader.fifo)
                 time.sleep(.5)
-                refresh = 0
-                intervals = []
-                bpm = 0
                 while collect:
                     if button.onepress():
                         collect = False
@@ -176,13 +173,7 @@ def bpm_start():
                         print('Stopped')
                     interval = hr.collect_hr()
                     print('interval ' + str(interval))
-                    intervals.append(interval)
-                    refresh += 1
-                    if len(intervals) > 5 and refresh > 5:
-                        oled.text(str(bpm), 50, 34, 0)
-                        bpm = hr.calculate_hr()
-                        oled.text(str(bpm), 50, 34, 1)
-                        refresh = 0
+                    hr.calculate_hr()
             if place == 1:
                 main_menu()
                 bpmStart = False
@@ -229,8 +220,10 @@ def hrv_mesuring():
     oled.show()
     timer.init(mode=Timer.ONE_SHOT, period=30000, callback=hrv_results)
     progressbar()
+    hr.collect_start()
     hrvMesure = True
     while hrvMesure == True:
+        hr.collect_hr()
         if button.onepress():
             oled.fill(0)
             oled.text("Mesurment", 0, 20, 1)
@@ -243,6 +236,7 @@ def hrv_mesuring():
 
 def hrv_results(tid):
     oled.fill(0)
+    hr.collect_end()
     values = hr.calculate()
     oled.text("Mean PPI: " + str(values["mean_ppi"]), 0, 0, 1)
     oled.text("Mean HR: " + str(values["mean_hr"]), 0, 10, 1)
@@ -294,6 +288,7 @@ def kubios_start():
 
 def kubios_mesuring():
     oled.fill(0)
+    hr.collect_start()
     oled.text("Mesuring. Press", 0, 0, 1)
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
@@ -308,6 +303,7 @@ def kubios_mesuring():
         if button.onepress():
             # stop mesurment and dont save it
             kubios_start()
+            hr.collect_end()
             kubiosMesure = False
 
 

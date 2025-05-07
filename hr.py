@@ -40,7 +40,6 @@ class HR:
     def get_beat_interval(self):
         beat_interval = 1
         show_counter = 0
-        print(self.reader.fifo)
         if self.prev == 0 and self.curr == 0 and self.next == 0:
             while len(self.data) < 3:
                 i = 0
@@ -78,7 +77,8 @@ class HR:
                         self.data.append(self.prev)
                         self.data.append(self.curr)
                         self.data.append(self.next)
-                        return beat_interval * self.reader.interval * self.squish
+                        ppi =  beat_interval * self.reader.interval * self.squish
+                        return ppi
 
                 if len(self.ppg_points) > 128 * self.squish + 1:
                     self.ppg_points.pop(0)

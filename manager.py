@@ -11,6 +11,7 @@ import ujson
 class Manager:
     def __init__(self, ppg):
         self.hr = HR(ppg)
+        self.screen = self.hr.ppg.screen
         self.intervals = []
         self.collecting = False
         self.timeStart = None
@@ -24,6 +25,7 @@ class Manager:
         self.wifi_ssid = 'KMD652_Group_2'
         self.wifi_password = 'N4fSLAzxu7VvEm8'
         self.connect_wifi()
+        self.bpm = 0
         if not self.history_dir():
             os.mkdir("/history")
 
@@ -42,11 +44,13 @@ class Manager:
 
     def collect_hr(self):
         interval = self.hr.get_beat_interval()
-        self.intervals.append(interval)
+        if 315 < interval < 1400:
+            self.intervals.append(interval)
         return interval
 
     def collect_start(self):
         self.timeStart = time.time()
+        self.intervals.clear()
         self.collecting = True
 
     def collect_end(self):
@@ -57,6 +61,7 @@ class Manager:
 
     def calculate_hr(self):
         a = 0
+        self.screen.text(str(self.bpm), 50, 34, 0)
         if len(self.intervals) > 5:
             a += self.intervals[len(self.intervals) - 5]
             a += self.intervals[len(self.intervals) - 4]
@@ -66,9 +71,9 @@ class Manager:
             a = a/5
             b = 60*(1000/a)
             b = round(b, 1)
-            return b
-        else:
-            return None
+            self.bpm = b
+        self.screen.text(str(self.bpm), 50, 34, 1)
+        self.screen.show()
 
     def send_data(self):
         try:
