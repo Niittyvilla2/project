@@ -137,7 +137,7 @@ class Manager:
             i += 1
         rmssd = math.sqrt(p / (i - 1))
         time = self.rtc.datetime()
-        time_str = "{:02D}-{:02D}-{:02D}-{:02D}{:02D}".format(time[0] % 100, time[1], time[2], time[4], time[5])
+        time_str = "{:02d}-{:02d}-{:02d}-{:02d}{:02d}".format(time[0] % 100, time[1], time[2], time[4], time[5])
         timestamp = time_str
         self.intervals.clear()
 
