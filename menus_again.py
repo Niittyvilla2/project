@@ -329,6 +329,11 @@ def kubios_results(tid):
     oled.text("Waiting results", 0, 0, 1)
     oled.text("Please wait", 0, 9, 1)
     oled.show()
+    progressbar()
+    for a in range(30):
+        time.sleep(.5)
+        print(a)
+        oled.show()
     data = manager.get_data()
     print("TEST")
     while kubiosResults == True:

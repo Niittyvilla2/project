@@ -57,6 +57,7 @@ class Manager:
 
     def collect_end(self):
         self.collecting = False
+        self.hr.reader.stop()
         if len(self.intervals) > self.minIntervals and self.kubios:
             self.send_data()
 
