@@ -4,6 +4,7 @@ import json
 from machine import RTC
 import math
 from hr import HR
+from datetime import datetime
 import time
 import os
 import ujson

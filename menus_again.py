@@ -79,7 +79,7 @@ def kubios_cursor(place):
     oled.fill_rect(60, 56, 10, 64, 0)
     oled.text(">", place, 56, 1)
 
-def progressbar(tid):
+def progressbar():
     prog = 0
     def progress(tid):
         nonlocal prog
@@ -288,11 +288,13 @@ def kubios_start():
 
 def kubios_mesuring():
     oled.fill(0)
+    manager.kubios = True
     manager.collect_start()
     oled.text("Mesuring. Press", 0, 0, 1)
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
+    progressbar()
     # Progressbar?
     # gather data for 30s
     # send and recive data from Kubios, save mesurment with timestamp
@@ -302,6 +304,7 @@ def kubios_mesuring():
     while kubiosMesure == True:
         if button.onepress():
             # stop mesurment and dont save it
+            manager.kubios = False
             kubiosMesure = False
             manager.collect_end()
             kubios_start()
