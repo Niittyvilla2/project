@@ -10,7 +10,6 @@ from reader import Reader
 from piotimer import Piotimer
 import micropython
 from manager import Manager
-from hrv_analysis import Analysis
 
 class Button(Pin):
     def __init__(self, *args, **kwargs):
@@ -394,6 +393,7 @@ def history_show(alloy):
     oled.fill(0)
     oled.text("Back", 0, 0, 1)
     oled.text(str(placeholder[alloy - 1]), 0, 10)  # show the content of chosen alloy
+    
     oled.show()
     historyShow = True
     while historyShow == True:
