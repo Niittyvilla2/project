@@ -240,7 +240,7 @@ def hrv_results(tid):
     oled.fill(0)
     manager.collect_end()
     values = manager.calculate()
-    oled.text("Mean PPI:" + str(values["mean_ppi"]), 0, 10, 1)
+    oled.text("Mean PPI:" + str(values["mean_ppi"]), 0, 0, 1)
     oled.text("Mean HR:" + str(values["mean_hr"]), 0, 10, 1)
     oled.text("RMSSD:" + str(values["rmssd"]), 0, 20, 1)
     oled.text("SDNN:" + str(values["sdnn"]), 0, 30, 1)
