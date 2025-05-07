@@ -240,20 +240,15 @@ def hrv_results(tid):
     oled.fill(0)
     manager.collect_end()
     values = manager.calculate()
-    oled.text("Mean PPI:" + str(values["mean_ppi"]), 0, 0, 1)
-    oled.text("Mean HR:" + str(values["mean_hr"]), 0, 10, 1)
-    oled.text("RMSSD:" + str(values["rmssd"]), 0, 20, 1)
-    oled.text("SDNN:" + str(values["sdnn"]), 0, 30, 1)
-    oled.text("Back", 10, 56, 1)
     hrv_cursor(0)
+    oled.text(f"Mean PPI {values['mean_ppi']}", 0, 0, 1)
+    oled.text(f"Mean HR {values['mean_hr']}", 0, 9, 1)
+    oled.text(f"RMSSD {values['rmssd']}", 0, 19, 1)
+    oled.text(f"SDNN {values['sdnn']}", 0, 28, 1)
+    oled.text(f"{values['timestamp']}", 0, 37, 1)
     oled.show()
     hrvResults = True
     while hrvResults == True:
-        oled.text(f"Mean PPI {values['mean_ppi']}", 0, 0, 1)
-        oled.text(f"Mean HR {values['mean_hr']}", 0, 9, 1)
-        oled.text(f"RMSSD {values['rmssd']}", 0, 19, 1)
-        oled.text(f"SDNN {values['sdnn']}", 0, 28, 1)
-        oled.text(f"Timestamp {values['timestamp']}", 0, 37, 1)
         if button.onepress():
             hrvResults = False
             hrv_start()
@@ -336,6 +331,9 @@ def kubios_results(tid):
             oled.text("Please wait", 0, 9, 1)
             oled.show()
             data = manager.get_data()
+            print("TEST")
+            waiting = False
+        oled.fill(0)
         oled.text(f"Mean PPI:{data['data']['mean_rr_ms']}", 0, 0, 1)
         oled.text(f"Mean HR:{data['data']['mean_hr_bpm']:.2f}", 0, 9, 1)
         oled.text(f"RMSSD:{data['data']['rmssd_ms']:.2f}", 0, 19, 1)
@@ -344,7 +342,7 @@ def kubios_results(tid):
         oled.text(f"PNS:{data['data']['stress_index']:.2f}", 0, 46, 1)
         oled.text("Back", 10, 56, 1)
         menu_cursor(56)
-        waiting = False
+        oled.show()
         if button.onepress():
             kubiosResults = False
             kubios_start()
