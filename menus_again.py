@@ -162,19 +162,19 @@ def bpm_start():
         if button.onepress():
             if place == 0:
                 collect = True
-                hr.hr.reader.start(4)
-                hr.hr.set_show_ppg(True)
+                manager.hr.reader.start(4)
+                manager.hr.set_show_ppg(True)
                 time.sleep(.5)
                 while collect:
                     if button.onepress():
                         print('Stopped')
-                        hr.hr.reader.stop()
+                        manager.hr.reader.stop()
                         collect = False
                         print('Stopped')
                         
-                    interval = hr.collect_hr()
+                    interval = manager.collect_hr()
                     print('interval ' + str(interval))
-                    hr.calculate_hr()
+                    manager.calculate_hr()
             if place == 1:
                 main_menu()
                 bpmStart = False
@@ -221,10 +221,10 @@ def hrv_mesuring():
     oled.show()
     timer.init(mode=Timer.ONE_SHOT, period=30000, callback=hrv_results)
     progressbar()
-    hr.collect_start()
+    manager.collect_start()
     hrvMesure = True
     while hrvMesure == True:
-        hr.collect_hr()
+        manager.collect_hr()
         if button.onepress():
             oled.fill(0)
             oled.text("Mesurment", 0, 20, 1)
@@ -237,8 +237,8 @@ def hrv_mesuring():
 
 def hrv_results(tid):
     oled.fill(0)
-    hr.collect_end()
-    values = hr.calculate()
+    manager.collect_end()
+    values = manager.calculate()
     oled.text("Mean PPI: " + str(values["mean_ppi"]), 0, 0, 1)
     oled.text("Mean HR: " + str(values["mean_hr"]), 0, 10, 1)
     oled.text("RMSSD: " + str(values["rmssd"]), 0, 20, 1)
@@ -289,7 +289,7 @@ def kubios_start():
 
 def kubios_mesuring():
     oled.fill(0)
-    hr.collect_start()
+    manager.collect_start()
     oled.text("Mesuring. Press", 0, 0, 1)
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
@@ -304,7 +304,7 @@ def kubios_mesuring():
         if button.onepress():
             # stop mesurment and dont save it
             kubios_start()
-            hr.collect_end()
+            manager.collect_end()
             kubiosMesure = False
 
 
@@ -332,7 +332,7 @@ def history_menu():
     oled.text("Back", 10, 0, 1)
     y = 0
     count = 0
-    history = hr.get_history()
+    history = manager.get_history()
 
     for m in history:
         y += 10
@@ -411,7 +411,7 @@ oled_width = 128
 oled_height = 64
 oled = SSD1306_I2C(oled_width, oled_height, i2c)
 ppg = PPG(oled, 0, 0, 127, 30)
-hr = Manager(ppg)
+manager = Manager(ppg)
 button = Button(12, Pin.IN, Pin.PULL_UP)
 #analysis = Analysis()
 timer = Timer()
