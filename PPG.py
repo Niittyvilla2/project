@@ -52,9 +52,8 @@ class PPG:
             if i < low:
                 low = i
         scale = high - low
-        if scale > self.scale:
-            self.scale = scale
-            self.offset = low
+        self.scale = scale
+        self.offset = low
 
     def setOffset(self, list):
         low = list[0]

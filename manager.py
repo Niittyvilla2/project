@@ -1,4 +1,4 @@
-from pip._internal import network
+import network
 from umqtt.simple import MQTTClient
 import json
 from machine import RTC
