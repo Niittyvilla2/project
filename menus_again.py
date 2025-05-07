@@ -205,11 +205,11 @@ def hrv_start():
         oled.show()
         if button.onepress():
             if place == 1:
+                hrvStart = False
                 main_menu()
-                hrvStart = False
             if place == 0:
-                hrv_mesuring()
                 hrvStart = False
+                hrv_mesuring()
 
 
 def hrv_mesuring():
@@ -230,8 +230,8 @@ def hrv_mesuring():
             oled.text("stopped", 0, 30, 1)
             oled.show()
             time.sleep(3)
-            hrv_start()
             hrvMesure = False
+            hrv_start()
 
 
 def hrv_results(tid):
@@ -249,8 +249,8 @@ def hrv_results(tid):
     while hrvResults == True:
         
         if button.onepress():
-            hrv_start()
             hrvResults = False
+            hrv_start()
 
 
 def kubios_start():
@@ -279,11 +279,11 @@ def kubios_start():
         oled.show()
         if button.onepress():
             if place == 0:
+                kubiosStart = False
                 main_menu()
-                kubiosStart = False
             if place == 1:
-                kubios_mesuring()
                 kubiosStart = False
+                kubios_mesuring()
 
 
 def kubios_mesuring():
@@ -302,9 +302,9 @@ def kubios_mesuring():
     while kubiosMesure == True:
         if button.onepress():
             # stop mesurment and dont save it
-            kubios_start()
-            manager.collect_end()
             kubiosMesure = False
+            manager.collect_end()
+            kubios_start()
 
 
 def kubios_results():
@@ -322,8 +322,8 @@ def kubios_results():
     kubiosResults = True
     while kubiosResults == True:
         if button.onepress():
-            kubios_start()
             kubiosResults = False
+            kubios_start()
 
 
 def history_menu():
@@ -370,23 +370,23 @@ def history_menu():
         oled.show()
         if button.onepress():
             if place == 0:
+                historyMenu = False
                 main_menu()
-                historyMenu = False
             if place == 1:
-                history_show(1)
                 historyMenu = False
+                history_show(history[0])
             if place == 2:
-                history_show(2)
                 historyMenu = False
+                history_show(history[1])
             if place == 3:
-                history_show(3)
                 historyMenu = False
+                history_show(history[2])
             if place == 4:
-                history_show(4)
                 historyMenu = False
+                history_show(history[3])
             if place == 5:
-                history_show(5)
                 historyMenu = False
+                history_show(history[4])
 
 
 def history_show(alloy):
