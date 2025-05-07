@@ -26,7 +26,7 @@ class Manager:
         self.connect_wifi()
         self.bpm = 0
         self.kubios = False
-        self.rct = RCT
+        self.rct = RCT()
         if not self.history_dir():
             os.mkdir("/history")
 
@@ -51,7 +51,7 @@ class Manager:
 
     def collect_start(self):
         time = self.rtc.datetime()
-        self.timeStart = time.strftime('%y-%m-%d-%H:%M')
+        self.timeStart = str(time[0])[2:4] + "-" + str(time[1]) + "-" + str(time[2]) + " " + str(time[4]) +  str(time[5])
         self.intervals.clear()
         self.collecting = True
 
