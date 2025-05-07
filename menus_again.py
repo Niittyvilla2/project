@@ -221,6 +221,8 @@ def hrv_mesuring():
     timer.init(mode=Timer.ONE_SHOT, period=30000, callback=hrv_results)
     progressbar()
     manager.collect_start()
+    manager.hr.reader.start(4)
+    time.sleep(.5)
     hrvMesure = True
     while hrvMesure == True:
         manager.collect_hr()
@@ -229,6 +231,7 @@ def hrv_mesuring():
             oled.text("Mesurment", 0, 20, 1)
             oled.text("stopped", 0, 30, 1)
             oled.show()
+            manager.hr.reader.stop()
             time.sleep(3)
             hrvMesure = False
             hrv_start()
