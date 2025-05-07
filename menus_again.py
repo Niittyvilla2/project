@@ -329,7 +329,7 @@ def kubios_results():
         oled.text(f"RMSSD {data['data']['rmssd_ms']:.2f}", 0, 19, 1)
         oled.text(f"SDNN {data['data']['sdnn_ms']:.2f}", 0, 28, 1)
         oled.text(f"SNS {data['data']['sns_index']:.2f}", 0, 37, 1)
-        oled.text(f"PNS {data['data']['stress_index'].2f}", 0, 46, 1)
+        oled.text(f"PNS {data['data']['stress_index']:.2f}", 0, 46, 1)
         oled.text("Back", 10, 56, 1)
         menu_cursor(56)
         waiting = False
