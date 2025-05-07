@@ -374,6 +374,7 @@ def history_menu():
                 main_menu()
             if place == 1:
                 historyMenu = False
+                print("test")
                 history_show(history[0])
             if place == 2:
                 historyMenu = False
@@ -392,8 +393,8 @@ def history_menu():
 def history_show(alloy):
     oled.fill(0)
     oled.text("Back", 0, 0, 1)
-    oled.text(str(placeholder[alloy - 1]), 0, 10)  # show the content of chosen alloy
-    
+    #oled.text(str(placeholder[alloy - 1]), 0, 10)  # show the content of chosen alloy
+    his = manager.get_history(alloy)
     oled.show()
     historyShow = True
     while historyShow == True:
@@ -404,7 +405,7 @@ def history_show(alloy):
 
 # defining stuff
 micropython.alloc_emergency_exception_buf(200)
-placeholder = [5, 2]
+#placeholder = [5, 2]
 rot = Encoder(10, 11)
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
 oled_width = 128
