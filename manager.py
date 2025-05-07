@@ -26,7 +26,7 @@ class Manager:
         self.connect_wifi()
         self.bpm = 0
         self.kubios = False
-        self.rct = RCT()
+        self.rct = RTC()
         if not self.history_dir():
             os.mkdir("/history")
 
