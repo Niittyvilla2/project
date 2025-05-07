@@ -169,8 +169,8 @@ def bpm_start():
                         print('Stopped')
                         manager.hr.reader.stop()
                         collect = False
-                        print('Stopped')
-                        
+                        continue
+
                     interval = manager.collect_hr()
                     print('interval ' + str(interval))
                     manager.calculate_hr()
@@ -413,7 +413,6 @@ oled = SSD1306_I2C(oled_width, oled_height, i2c)
 ppg = PPG(oled, 0, 0, 127, 30)
 manager = Manager(ppg)
 button = Button(12, Pin.IN, Pin.PULL_UP)
-#analysis = Analysis()
 timer = Timer()
 
 main_menu()
