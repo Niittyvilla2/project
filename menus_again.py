@@ -331,18 +331,15 @@ def history_menu():
     oled.fill(0)
     oled.text("Back", 10, 0, 1)
     y = 0
-    alloy = 0
+    count = 0
+    history = hr.get_history()
 
-    if len(placeholder) < 5:
-        for a in range(len(placeholder)):
-            y += 10
-            alloy += 1
-            oled.text("Mesurment " + str(alloy), 10, y, 1)
-    elif len(placeholder) >= 5:
-        for a in range(5):
-            y += 10
-            alloy += 1
-            oled.text("Mesurment " + str(alloy), 10, y, 1)
+    for m in history:
+        y += 10
+        count += 1
+        oled.text(m[0:len(m)-6], 10, y, 1)
+        if count > 5:
+            continue
 
     menu_cursor(0)
     oled.show()
@@ -356,23 +353,21 @@ def history_menu():
                 place = 0
                 menu_cursor(0)
 
-            elif place == 1 and alloy > 0:
+            elif place == 1 and count >= 1:
                 menu_cursor(10)
 
-            elif place == 2 and alloy > 1:
+            elif place == 2 and count >= 2:
                 menu_cursor(20)
 
-            elif place == 3 and alloy > 2:
+            elif place == 3 and count >= 3:
                 menu_cursor(30)
 
-            elif place == 4 and alloy > 3:
+            elif place == 4 and count >= 4:
                 menu_cursor(40)
 
-            elif place == 5 and alloy > 4:
+            elif place == 5 and count >= 5:
                 menu_cursor(50)
 
-            if place >= alloy:
-                place = alloy
         oled.show()
         if button.onepress():
             if place == 0:

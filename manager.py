@@ -4,6 +4,7 @@ import json
 from machine import RTC
 import math
 from hr import HR
+from datetime import datetime
 import time
 import os
 import ujson
@@ -15,8 +16,7 @@ class Manager:
         self.intervals = []
         self.collecting = False
         self.timeStart = None
-        self.timeEnd = None
-        self.minIntervals = 30
+        self.minIntervals = 15
         self.rtc = RTC()
         self.mqtt_broker = "hrm02.asuscomm.com"
         self.mqtt_port = 1883
@@ -26,6 +26,7 @@ class Manager:
         self.wifi_password = 'N4fSLAzxu7VvEm8'
         self.connect_wifi()
         self.bpm = 0
+        self.kubios = False
         if not self.history_dir():
             os.mkdir("/history")
 
@@ -49,15 +50,15 @@ class Manager:
         return interval
 
     def collect_start(self):
-        self.timeStart = time.time()
+        time = datetime.now()
+        self.timeStart = time.strftime('%y-%m-%d-%H:%M')
         self.intervals.clear()
         self.collecting = True
 
     def collect_end(self):
-        self.timeEnd = time.time()
         self.collecting = False
-        #if len(self.intervals) > self.minIntervals:
-            #self.send_data()
+        if len(self.intervals) > self.minIntervals and self.kubios:
+            self.send_data()
 
     def calculate_hr(self):
         a = 0
@@ -81,7 +82,7 @@ class Manager:
             client.connect()
 
             payload = {
-                "id": str(self.timeStart) + '-' + str(self.timeEnd) ,  # Unique ID from current time
+                "id": self.timeStart,  # Unique ID from current time
                 "type": "RRI",
                 "data": self.intervals,  # This should be a list of ints
                 "analysis": {
