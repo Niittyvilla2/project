@@ -53,7 +53,8 @@ class Manager:
 
     def collect_start(self):
         time = self.rtc.datetime()
-        self.timeStart = str(time[0])[2:4] + "-" + str(time[1]) + "-" + str(time[2]) + " " + str(time[4]) +  str(time[5])
+        self.timeStart = str(time[0])[2:4] + "-" + str(time[1]) + "-" + str(time[2]) + " " + str(time[4]) + str(
+            time[5])
         self.intervals.clear()
         self.collecting = True
 
@@ -72,14 +73,14 @@ class Manager:
             a += self.intervals[len(self.intervals) - 3]
             a += self.intervals[len(self.intervals) - 2]
             a += self.intervals[len(self.intervals) - 1]
-            a = a/5
-            b = 60*(1000/a)
+            a = a / 5
+            b = 60 * (1000 / a)
             b = round(b, 1)
             self.bpm = b
         self.screen.text(str(self.bpm), 50, 34, 1)
         self.screen.show()
         if len(self.intervals) > 200:
-            for _ in self.intervals[0:len(self.intervals)-6]:
+            for _ in self.intervals[0:len(self.intervals) - 6]:
                 self.intervals.pop()
 
     def connect_mqtt(self):
@@ -92,6 +93,7 @@ class Manager:
             return None
 
     def send_data(self):
+        print('waiting kubios')
         client = None
         while client is None:
             client = self.connect_mqtt()
@@ -115,8 +117,8 @@ class Manager:
             time.sleep(5)
 
     def calculate(self):
-        #ppi = [5, 3, 5, 6]  # list of ppi's
-        #hr = [5, 3, 5, 6]  # list of hr's
+        # ppi = [5, 3, 5, 6]  # list of ppi's
+        # hr = [5, 3, 5, 6]  # list of hr's
         print('starting calc')
         mean_ppi = sum(self.intervals) / len(self.intervals)
         mean_hr = 60000 / mean_ppi
@@ -137,7 +139,7 @@ class Manager:
             i += 1
         rmssd = math.sqrt(p / (i - 1))
         time = self.rtc.datetime()
-        time_str = "{:02d}-{:02d}-{:02d}-{:02d}{:02d}".format(time[0] % 100, time[1], time[2], time[4], time[5])
+        time_str = "{:02d}-{:02d}-{:02d}-{:02d}-{:02d}".format(time[0] % 100, time[1], time[2], time[4], time[5])
         timestamp = time_str
         self.intervals.clear()
 
@@ -199,3 +201,4 @@ class Manager:
         data = {'analysis': analysis}
         json = {'id': measurements['timestamp'], 'data': data}
         self.save_history(json)
+

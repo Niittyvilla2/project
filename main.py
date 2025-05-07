@@ -390,7 +390,7 @@ def history_menu():
     for m in history:
         y += 10
         count += 1
-        oled.text(m[0:len(m)-6], 10, y, 1)
+        oled.text(m[0:len(m)-5], 10, y, 1)
         if count > 5:
             continue
 
