@@ -380,25 +380,37 @@ def history_menu():
                 menu_cursor(50)
 
         oled.show()
+        if place > count:
+            place = count
         if button.onepress():
+            time.sleep(0.1)
+            print(place)
             if place == 0:
                 historyMenu = False
                 main_menu()
-            if place == 1:
+                
+            if place == 1 and count >= 1:
                 historyMenu = False
-                print("test")
                 history_show(history[0])
-            if place == 2:
+                
+            if place == 2 and count >= 2:
                 historyMenu = False
+                
                 history_show(history[1])
-            if place == 3:
+                
+            if place == 3 and count >= 3:
                 historyMenu = False
+                
                 history_show(history[2])
-            if place == 4:
+                
+            if place == 4 and count >= 4:
                 historyMenu = False
+                
                 history_show(history[3])
-            if place == 5:
+                
+            if place == 5 and count >= 5:
                 historyMenu = False
+                
                 history_show(history[4])
 
 
@@ -406,7 +418,10 @@ def history_show(alloy):
     oled.fill(0)
     oled.text("Back", 0, 0, 1)
     #oled.text(str(placeholder[alloy - 1]), 0, 10)  # show the content of chosen alloy
-    his = manager.get_history(alloy)
+    file = "history/" + str(alloy)
+    print(file)
+    res = manager.read_history(file)["id", "]
+    print(res)
     oled.show()
     historyShow = True
     while historyShow == True:
