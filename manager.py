@@ -1,8 +1,9 @@
 from umqtt.simple import MQTTClient
 import json
-
-
+from machine import RTC
+import math
 from hr import HR
+import time
 
 class Manager:
     def __init__(self, ppg):
@@ -12,6 +13,7 @@ class Manager:
         self.timeStart = None
         self.timeEnd = None
         self.minIntervals = 30
+        self.rtc = RTC()
 
     def collect_hr(self):
         interval = self.hr.get_beat_interval()
@@ -19,11 +21,11 @@ class Manager:
         return interval
 
     def collect_start(self):
-        self.timeStart = time()
+        self.timeStart = time.time()
         self.collecting = True
 
     def collect_end(self):
-        self.timeEnd = time()
+        self.timeEnd = time.time()
         self.collecting = False
         #if len(self.intervals) > self.minIntervals:
             #self.send_data()
@@ -65,3 +67,37 @@ class Manager:
 
         except Exception as e:
             print("Upload failed:", e)
+
+    def calculate(self):
+        #ppi = [5, 3, 5, 6]  # list of ppi's
+        #hr = [5, 3, 5, 6]  # list of hr's
+        mean_ppi = sum(self.intervals) / len(self.intervals)
+        mean_hr = 60000 / mean_ppi
+        i = 0
+        ppisum = []
+
+        for _ in range(len(self.intervals)):
+            a = (self.intervals[i] - mean_ppi) ** 2
+            ppisum.append(a)
+            i += 1
+        sdnn = math.sqrt(sum(ppisum) / (i - 1))
+        i = 0
+        p = 0
+
+        for o in range((len(self.intervals)) - 1):
+            a = (self.intervals[o + 1] - self.intervals[o]) ** 2
+            p += a
+            i += 1
+        rmssd = math.sqrt(p / (i - 1))
+        time = self.rtc.datetime()
+        date = str(time[0]) + "/" + str(time[1]) + "/" + str(time[2]) + " " + str(time[4]) + "." + str(time[5])
+        timestamp = date
+
+        mesurment = {
+            "mean_hr": round(mean_hr, 2),
+            "mean_ppi": round(mean_ppi, 2),
+            "rmssd": round(rmssd, 2),
+            "sdnn": round(sdnn, 2),
+            "timestamp": timestamp
+        }
+        return mesurment

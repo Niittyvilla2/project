@@ -243,7 +243,7 @@ def hrv_mesuring():
 
 def hrv_results(tid):
     oled.fill(0)
-    values = analysis.calculate()
+    values = hr.calculate()
     oled.text("Mean PPI: " + str(values["mean_ppi"]), 0, 0, 1)
     oled.text("Mean HR: " + str(values["mean_hr"]), 0, 10, 1)
     oled.text("RMSSD: " + str(values["rmssd"]), 0, 20, 1)
@@ -421,7 +421,7 @@ oled = SSD1306_I2C(oled_width, oled_height, i2c)
 ppg = PPG(oled, 0, 0, 127, 30)
 hr = Manager(ppg)
 button = Button(12, Pin.IN, Pin.PULL_UP)
-analysis = Analysis()
+#analysis = Analysis()
 timer = Timer()
 
 hrv_start()
