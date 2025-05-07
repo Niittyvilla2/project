@@ -77,26 +77,37 @@ class Manager:
         self.screen.text(str(self.bpm), 50, 34, 1)
         self.screen.show()
 
-    def send_data(self):
+    def connect_mqtt(self):
         try:
             client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
             client.connect()
-
-            payload = {
-                "id": self.timeStart,  # Unique ID from current time
-                "type": "RRI",
-                "data": self.intervals,  # This should be a list of ints
-                "analysis": {
-                    "type": "readiness"
-                }
-            }
-
-            client.publish(self.mqtt_topic_request, json.dumps(payload))
-            client.disconnect()
-            print("Data uploaded to Kubios Proxy.")
-
+            return client
         except Exception as e:
             print("Upload failed: ", e)
+            return None
+
+    def send_data(self):
+        client = None
+        while client is None:
+            client = self.connect_mqtt()
+            if client:
+                try:
+                    payload = {
+                        "id": self.timeStart,  # Unique ID from current time
+                        "type": "RRI",
+                        "data": self.intervals,  # This should be a list of ints
+                        "analysis": {
+                            "type": "readiness"
+                        }
+                    }
+
+                    client.publish(self.mqtt_topic_request, json.dumps(payload))
+                    client.disconnect()
+                    print("Data uploaded to Kubios Proxy.")
+
+                except Exception as e:
+                    print("Upload failed: ", e)
+            time.sleep(5)
 
     def calculate(self):
         #ppi = [5, 3, 5, 6]  # list of ppi's
@@ -134,20 +145,23 @@ class Manager:
 
     def get_data(self):
         message = None
+        client = None
 
         def callback(topic, msg):
             nonlocal message
             message = msg
 
-        client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
-        client.set_callback(callback)
-        client.connect()
-        client.subscribe(self.mqtt_topic_response)
-        while message is None:
-            client.check_msg()
-        client.disconnect()
-        self.save_history(message)
-        return message
+        while client is None:
+            client = self.connect_mqtt()
+            if client:
+                client.set_callback(callback)
+                client.subscribe(self.mqtt_topic_response)
+                while message is None:
+                    client.check_msg()
+                client.disconnect()
+                self.save_history(message)
+                return message
+            time.sleep(5)
 
     def get_history(self):
         history_list = os.listdir("/history")
