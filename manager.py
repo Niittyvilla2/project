@@ -1,3 +1,4 @@
+from pip._internal import network
 from umqtt.simple import MQTTClient
 import json
 from machine import RTC
@@ -20,8 +21,18 @@ class Manager:
         self.mqtt_port = 1883
         self.mqtt_topic_request = "kubios-request"
         self.mqtt_topic_response = "kubios-response"
+        self.wifi_ssid = 'KMD652_Group_2'
+        self.wifi_password = 'N4fSLAzxu7VvEm8'
+        self.connect_wifi()
         if not self.history_dir():
             os.mkdir("/history")
+
+    def connect_wifi(self):
+        wlan = network.WLAN(network.STA_IF)
+        wlan.active(True)
+        wlan.connect(self.wifi_ssid, self.wifi_password)
+        while not wlan.isconnected():
+            time.sleep(1)
 
     def history_dir(self):
         try:
@@ -115,19 +126,21 @@ class Manager:
         return mesurment
 
     def get_data(self):
+        client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
+        client.set_callback(self.save_history)
+        client.connect()
+        client.subscribe(self.mqtt_topic_response)
         try:
-            client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
-            client.connect()
-
+            while True:
+                client.wait_msg()
+        finally:
             client.disconnect()
-        except Exception as e:
-            print("Fetch failed: ", e)
 
     def get_history(self):
         history_list = os.listdir("/history")
         return history_list
 
-    def save_history(self, response):
+    def save_history(self, topic, response):
         name = '/' + response['id'] + '.json'
         if os.path.exists(name):
             print("History file already exists")
