@@ -319,6 +319,8 @@ def kubios_mesuring():
 
 def kubios_results(tid):
     oled.fill(0)
+    manager.hr.reader.stop()
+    manager.collect_end()
     # display kubios data
     kubios_cursor(0)
     oled.show()
