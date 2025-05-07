@@ -247,7 +247,11 @@ def hrv_results(tid):
     oled.show()
     hrvResults = True
     while hrvResults == True:
-        
+        oled.text(f"Mean PPI {values['mean_ppi']}", 0, 0, 1)
+        oled.text(f"Mean HR {values['mean_hr']}", 0, 9, 1)
+        oled.text(f"RMSSD {values['rmssd']}", 0, 19, 1)
+        oled.text(f"SDNN {values['sdnn']}", 0, 28, 1)
+        oled.text(f"Timestamp {values['timestamp']}", 0, 37, 1)
         if button.onepress():
             hrvResults = False
             hrv_start()
