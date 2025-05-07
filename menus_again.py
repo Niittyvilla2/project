@@ -313,17 +313,26 @@ def kubios_mesuring():
 def kubios_results():
     oled.fill(0)
     # display kubios data
-    oled.text("Mean PPI", 0, 0, 1)
-    oled.text("Mean HR", 0, 9, 1)
-    oled.text("RMSDD", 0, 19, 1)
-    oled.text("SDNN", 0, 28, 1)
-    oled.text("SNS", 0, 37, 1)
-    oled.text("PNS", 0, 46, 1)
-    oled.text("Back", 10, 56, 1)
     kubios_cursor(0)
     oled.show()
     kubiosResults = True
+    waiting = True
     while kubiosResults == True:
+        while waiting == True:
+            oled.fill(0)
+            oled.text("Waiting results", 0, 0, 1)
+            oled.text("Please wait", 0, 9, 1)
+            oled.show()
+            data = manager.get_data()
+        oled.text(f"Mean PPI {data['data']['mean_rr_ms']}", 0, 0, 1)
+        oled.text(f"Mean HR {data['data']['mean_hr_bpm']:.2f}", 0, 9, 1)
+        oled.text(f"RMSSD {data['data']['rmssd_ms']:.2f}", 0, 19, 1)
+        oled.text(f"SDNN {data['data']['sdnn_ms']:.2f}", 0, 28, 1)
+        oled.text(f"SNS {data['data']['sns_index']:.2f}", 0, 37, 1)
+        oled.text(f"PNS {data['data']['stress_index'].2f}", 0, 46, 1)
+        oled.text("Back", 10, 56, 1)
+        menu_cursor(56)
+        waiting = False
         if button.onepress():
             kubiosResults = False
             kubios_start()
