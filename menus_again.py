@@ -248,6 +248,7 @@ def hrv_results(tid):
     oled.text(f"RMSSD {values['rmssd']}", 0, 19, 1)
     oled.text(f"SDNN {values['sdnn']}", 0, 28, 1)
     oled.text(f"{values['timestamp']}", 0, 37, 1)
+    oled.text("Back", 10, 56, 1)
     oled.show()
     hrvResults = True
     while hrvResults == True:
