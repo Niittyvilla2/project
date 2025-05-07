@@ -4,6 +4,8 @@ from machine import RTC
 import math
 from hr import HR
 import time
+import os
+import ujson
 
 class Manager:
     def __init__(self, ppg):
@@ -14,6 +16,18 @@ class Manager:
         self.timeEnd = None
         self.minIntervals = 30
         self.rtc = RTC()
+        self.mqtt_broker = "hrm02.asuscomm.com"
+        self.mqtt_port = 1883
+        self.mqtt_topic_request = "kubios-request"
+        self.mqtt_topic_response = "kubios-response"
+        if not self.history_dir():
+            os.mkdir("/history")
+
+    def history_dir(self):
+        try:
+            return "history" in os.listdir("/")
+        except Exception as e:
+            return False
 
     def collect_hr(self):
         interval = self.hr.get_beat_interval()
@@ -29,6 +43,7 @@ class Manager:
         self.collecting = False
         #if len(self.intervals) > self.minIntervals:
             #self.send_data()
+
     def calculate_hr(self):
         a = 0
         if len(self.intervals) > 5:
@@ -45,11 +60,8 @@ class Manager:
             return None
 
     def send_data(self):
-        MQTT_BROKER = "hrm02.asuscomm.com"
-        MQTT_PORT = 1883
-        TOPIC_RRI = "kubios-request"
         try:
-            client = MQTTClient(client_id="hrva3000", server=MQTT_BROKER, port=MQTT_PORT)
+            client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
             client.connect()
 
             payload = {
@@ -61,12 +73,12 @@ class Manager:
                 }
             }
 
-            client.publish(TOPIC_RRI, json.dumps(payload))
+            client.publish(self.mqtt_topic_request, json.dumps(payload))
             client.disconnect()
             print("Data uploaded to Kubios Proxy.")
 
         except Exception as e:
-            print("Upload failed:", e)
+            print("Upload failed: ", e)
 
     def calculate(self):
         #ppi = [5, 3, 5, 6]  # list of ppi's
@@ -101,3 +113,28 @@ class Manager:
             "timestamp": timestamp
         }
         return mesurment
+
+    def get_data(self):
+        try:
+            client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
+            client.connect()
+
+            client.disconnect()
+        except Exception as e:
+            print("Fetch failed: ", e)
+
+    def get_history(self):
+        history_list = os.listdir("/history")
+        return history_list
+
+    def save_history(self, response):
+        name = '/' + response['id'] + '.json'
+        if os.path.exists(name):
+            print("History file already exists")
+            return
+        with open(name, 'w') as json_file:
+            ujson.dump(response, json_file)
+
+    def read_history(self, file):
+        with open(file, 'r') as json_file:
+            return ujson.load(json_file)
