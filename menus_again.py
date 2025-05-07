@@ -143,8 +143,7 @@ def bpm_start():
     oled.fill(0)
     oled.text("Start/Stop", 10, 54, 1)
     oled.text("Back", 10, 44, 1)
-    oled.text("BPM: ", 10, 34, 1)  # update bpm every 5 seconds
-    # oled.fill_rect(0, 0, 127, 30, 1) #Import PPG graph and display here
+    oled.text("BPM: ", 10, 34, 1)
     menu_cursor(44)
     oled.show()
     bpmStart = True
@@ -168,9 +167,11 @@ def bpm_start():
                 time.sleep(.5)
                 while collect:
                     if button.onepress():
-                        collect = False
-                        hr.hr.reader.stop()
                         print('Stopped')
+                        hr.hr.reader.stop()
+                        collect = False
+                        print('Stopped')
+                        
                     interval = hr.collect_hr()
                     print('interval ' + str(interval))
                     hr.calculate_hr()
@@ -420,5 +421,5 @@ button = Button(12, Pin.IN, Pin.PULL_UP)
 #analysis = Analysis()
 timer = Timer()
 
-hrv_start()
+main_menu()
 
