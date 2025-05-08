@@ -185,6 +185,8 @@ class Manager:
         return mesurment
 
     def get_data(self):
+        while self.response is None:
+            self.client.check_msg()
         return self.response
 
     def get_history(self):
