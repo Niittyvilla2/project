@@ -187,6 +187,8 @@ class Manager:
     def get_data(self):
         while self.response is None:
             self.client.check_msg()
+        self.response = self.response.decode()
+        self.response = ujson.loads(self.response)
         return self.response
 
     def get_history(self):
