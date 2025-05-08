@@ -341,7 +341,7 @@ def kubios_mesuring():
             timer.deinit()
             manager.collect_end()
             kubios_start()
-
+    time.sleep(3)
     print(manager.kubios)
     oled.fill(0)
     if not manager.collect_end():
