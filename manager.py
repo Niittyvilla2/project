@@ -2,6 +2,7 @@ import network
 from umqtt.simple import MQTTClient
 import json
 from machine import RTC
+import ntptime
 import math
 from hr import HR
 import time
@@ -30,12 +31,16 @@ class Manager:
         self.rct = RTC()
         if not self.history_dir():
             os.mkdir("/history")
+        ntptime.settime()
 
     def connect_wifi(self):
         wlan = network.WLAN(network.STA_IF)
         wlan.active(True)
         wlan.connect(self.wifi_ssid, self.wifi_password)
         while not wlan.isconnected():
+            self.screen.text("Connecting", 10, 24, 1)
+            self.screen.text("to Wi-Fi", 10, 32, 1)
+            self.screen.show()
             print('wifi retry')
             time.sleep(3)
 
@@ -227,6 +232,7 @@ class Manager:
             values['sns'] = response['data']['analysis']['sns_index']
         if int(response['data']['analysis']['stress_index']) != 0:
             values['pns'] = response['data']['analysis']['stress_index']
+        print(f"History: {values}")
         self.send_proxy(values)
 
     def read_history(self, file):
@@ -242,5 +248,6 @@ class Manager:
                     'stress_index': 0.00}
         data = {'analysis': analysis}
         json = {'id': measurements['timestamp'], 'data': data}
+        print(f"Local : {json}")
         self.save_history(json)
 

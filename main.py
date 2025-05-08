@@ -344,7 +344,9 @@ def kubios_mesuring():
     time.sleep(3)
     print(manager.kubios)
     oled.fill(0)
-    if not manager.collect_end():
+    send = manager.collect_end()
+    time.sleep(3)
+    if not send:
         menu_cursor(0)
         oled.text("Back", 10, 0, 1)
         oled.text("Not enough", 8, 9, 1)
