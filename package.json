@@ -5,7 +5,7 @@
     ["manager.py", "http://localhost:8000/manager.py"],
     ["PPG.py", "http://localhost:8000/PPG.py"],
     ["reader.py", "http://localhost:8000/reader.py"],
-    ["25-05-07-17-45.json", "http://localhost:8000/history/25-05-07-17-45.json"],
+    ["history/25-05-07-17-45.json", "http://localhost:8000/history/25-05-07-17-45.json"],
     ["lib/filefifo.py", "http://localhost:8000/pico-lib/filefifo.py"],	
     ["lib/fifo.py", "http://localhost:8000/pico-lib/fifo.py"],
     ["lib/piotimer.py", "http://localhost:8000/pico-lib/piotimer.py"],
