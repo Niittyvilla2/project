@@ -231,7 +231,7 @@ class Manager:
                   "mean_hr": response['data']['analysis']['mean_hr_bpm'],
                   "mean_ppi": response['data']['analysis']['mean_rr_ms'],
                   "rmssd": response['data']['analysis']['rmssd_ms'],
-                  "sdnn": response['data']['analysis']['sdnn-ms']}
+                  "sdnn": response['data']['analysis']['sdnn_ms']}
         if 'sns_index' in response:
             values['sns'] = response['data']['analysis']['sns_index']
         if 'stress_index' in response:
