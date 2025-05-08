@@ -25,6 +25,9 @@ class Manager:
         self.mqtt_topic_save = "hr-data"
         self.wifi_ssid = 'KMD652_Group_2'
         self.wifi_password = 'N4fSLAzxu7VvEm8'
+        self.screen.text("Connecting", 10, 24, 1)
+        self.screen.text("to Wi-Fi", 10, 32, 1)
+        self.screen.show()
         self.connect_wifi()
         self.bpm = 0
         self.kubios = False
@@ -38,9 +41,6 @@ class Manager:
         wlan.active(True)
         wlan.connect(self.wifi_ssid, self.wifi_password)
         while not wlan.isconnected():
-            self.screen.text("Connecting", 10, 24, 1)
-            self.screen.text("to Wi-Fi", 10, 32, 1)
-            self.screen.show()
             print('wifi retry')
             time.sleep(3)
 
