@@ -111,6 +111,7 @@ class Manager:
 
     def mqtt_callback(self, topic, msg):
         self.response = msg
+        print(msg)
 
     def send_proxy(self, values):
         client = None
