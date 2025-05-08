@@ -108,7 +108,7 @@ class Manager:
     def send_proxy(self, values):
         client = None
         date = time.time()
-        data = {"id": values['timestamp'],
+        data = {"id": self.timeStart,
                 "timestamp": date,
                 "mean_hr": values['mean_hr'],
                 "mean_ppi": values['mean_ppi'],
