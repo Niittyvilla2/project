@@ -29,6 +29,7 @@ class Manager:
         self.screen.text("to Wi-Fi", 10, 32, 1)
         self.screen.show()
         self.connect_wifi()
+        self.client = self.connect_mqtt()
         self.bpm = 0
         self.kubios = False
         self.rct = RTC()
@@ -118,40 +119,27 @@ class Manager:
             data['sns'] = values['sns']
         if 'pns' in values:
             data['pns'] = values['pns']
-        while client is None:
-            client = self.connect_mqtt()
-            if client:
-                try:
-                    client.publish(self.mqtt_topic_save, ujson.dumps(data))
-                    client.disconnect()
-                    print('Data saved to proxy')
-                except Exception as e:
-                    print("Upload failed: ", e)
-            time.sleep(5)
+        try:
+            self.client.publish(self.mqtt_topic_save, ujson.dumps(data))
+            print('Data saved to proxy')
+        except Exception as e:
+            print("Upload failed: ", e)
 
     def send_data(self):
         print('waiting kubios')
-        client = None
-        while client is None:
-            client = self.connect_mqtt()
-            if client:
-                try:
-                    payload = {
-                        "id": self.timeStart,  # Unique ID from current time
-                        "type": "RRI",
-                        "data": self.intervals,  # This should be a list of ints
-                        "analysis": {
-                            "type": "readiness"
-                        }
-                    }
-
-                    client.publish(self.mqtt_topic_request, json.dumps(payload))
-                    client.disconnect()
-                    print("Data uploaded to Kubios Proxy.")
-
-                except Exception as e:
-                    print("Upload failed: ", e)
-            time.sleep(5)
+        try:
+            payload = {
+                "id": self.timeStart,  # Unique ID from current time
+                "type": "RRI",
+                "data": self.intervals,  # This should be a list of ints
+                "analysis": {
+                    "type": "readiness"
+                }
+            }
+            self.client.publish(self.mqtt_topic_request, json.dumps(payload))
+            print("Data uploaded to Kubios Proxy.")
+        except Exception as e:
+            print("Upload failed: ", e)
 
     def calculate(self):
         # ppi = [5, 3, 5, 6]  # list of ppi's
@@ -199,20 +187,15 @@ class Manager:
             print('Kubios analysis retrieved')
             message = msg
 
-        while client is None:
-            client = self.connect_mqtt()
-            if client:
-                client.set_callback(callback)
-                client.subscribe(self.mqtt_topic_response)
-                while message is None:
-                    print(f"waiting for response {counter}s")
-                    client.check_msg()
-                    time.sleep(5)
-                    counter += 5
-                client.disconnect()
-                self.save_history(message)
-                return message
+        self.client.set_callback(callback)
+        self.client.subscribe(self.mqtt_topic_response)
+        while message is None:
+            print(f"waiting for response {counter}s")
+            self.client.check_msg()
             time.sleep(5)
+            counter += 5
+        self.save_history(message)
+        return message
 
     def get_history(self):
         history_list = os.listdir("/history")
