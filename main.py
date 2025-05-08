@@ -196,6 +196,7 @@ def bpm_start():
 
 def hrv_start():
     global state
+    state = 'hrvStart'
     oled.fill(0)
     oled.text("Start meruring", 0, 0, 1)
     oled.text("by placing your", 0, 10, 1)
@@ -206,9 +207,8 @@ def hrv_start():
     oled.text("Back", 70, 56, 1)
     hrv_cursor(0)
     oled.show()
-    hrvStart = True
     place = 0
-    while hrvStart == True:
+    while state == 'hrvStart':
         if rot.fifo.has_data():
             i = rot.fifo.get()
             place += i
@@ -273,9 +273,9 @@ def hrv_mesuring():
     oled.text("Back", 10, 56, 1)
     oled.show()
     manager.save_local(values)
-    while hrvResults == True:
+    while state == 'hrvResults':
         if button.onepress():
-            hrvResults = False
+            state = 'hrvStart'
             hrv_start()
 
 def hrv_end(tid):
