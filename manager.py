@@ -17,8 +17,8 @@ class Manager:
         self.timeStart = None
         self.minIntervals = 15
         self.rtc = RTC()
-        self.mqtt_broker = "hrm02.asuscomm.com"
-        self.mqtt_port = 1883
+        self.mqtt_broker = "192.168.2.253"
+        self.mqtt_port = 21883
         self.mqtt_topic_request = "kubios-request"
         self.mqtt_topic_response = "kubios-response"
         self.mqtt_topic_save = "hr-data"
@@ -112,6 +112,10 @@ class Manager:
                             "mean_ppi": values['mean_ppi'],
                             "rmssd": values['rmssd'],
                             "sdnn": values['sdnn']}
+                    if 'sns' in values:
+                        data['sns'] = values['sns']
+                    if 'pns' in values:
+                        data['pns'] = values['pns']
                     client.publish(self.mqtt_topic_save, ujson.dumps(data))
                     client.disconnect()
                     print('Data saved to proxy')
