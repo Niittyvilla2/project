@@ -373,7 +373,7 @@ def kubios_mesuring():
         oled.text(f"SNS:{data['data']['analysis']['sns_index']:.2f}", 0, 37, 1)
         oled.text(f"PNS:{data['data']['analysis']['stress_index']:.2f}", 0, 46, 1)
         oled.text("Back", 10, 56, 1)
-        menu_cursor(56)
+        hrv_cursor(56)
         oled.show()
         if button.onepress():
             state = 'kubiosStart'
