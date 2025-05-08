@@ -349,7 +349,16 @@ def kubios_results(tid):
     oled.fill(0)
     bar.stop()
     manager.hr.reader.stop()
-    manager.collect_end()
+    if not manager.collect_end():
+        menu_cursor(0)
+        oled.text("Back", 0, 10, 1)
+        oled.text("Not enough", 9, 8, 1)
+        oled.text("intervals for", 18, 8, 1)
+        oled.text("Kubios analysis", 27, 8, 1)
+        oled.show()
+        while True:
+            if button.onepress():
+                kubios_start()
     # display kubios data
     kubios_cursor(0)
     oled.show()
