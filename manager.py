@@ -102,8 +102,8 @@ class Manager:
         try:
             self.client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
             self.client.connect()
-            self.client.subscribe(self.mqtt_topic_response)
             self.client.set_callback(self.mqtt_callback)
+            self.client.subscribe(self.mqtt_topic_response)
 
             print("Connected to MQTT broker")
         except Exception as e:
