@@ -11,6 +11,7 @@ from piotimer import Piotimer
 import micropython
 from manager import Manager
 
+
 class Button(Pin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,6 +63,7 @@ class Encoder:
         else:
             self.fifo.put(1)
 
+
 class Progressbar:
     def __init__(self, screen):
         self.prog = 0
@@ -82,10 +84,9 @@ class Progressbar:
 
     def start(self):
         self.prog = 0
-        self.timer = Piotimer(period=1000, mode=Piotimer.PERIODIC, callback=self.progress)
+        self.timer = Timer(period=1000, mode=Piotimer.PERIODIC, callback=self.progress)
         self.screen.rect(2, 50, 124, 12, 1)
         self.screen.fill_rect(4, 52, 1, 8, 1)
-
 
 
 def menu_cursor(place):
@@ -103,7 +104,8 @@ def kubios_cursor(place):
     oled.fill_rect(0, 56, 10, 64, 0)
     oled.fill_rect(60, 56, 10, 64, 0)
     oled.text(">", place, 56, 1)
-        
+
+
 def main_menu():
     # menu UI
     oled.fill(0)
@@ -193,6 +195,7 @@ def bpm_start():
 
 
 def hrv_start():
+    global state
     oled.fill(0)
     oled.text("Start meruring", 0, 0, 1)
     oled.text("by placing your", 0, 10, 1)
@@ -218,26 +221,26 @@ def hrv_start():
         oled.show()
         if button.onepress():
             if place == 1:
-                hrvStart = False
+                state = None
                 main_menu()
             if place == 0:
-                hrvStart = False
                 hrv_mesuring()
 
 
 def hrv_mesuring():
+    global state
+    state = 'hrvMeasuring'
     oled.fill(0)
     oled.text("Mesuring. Press", 0, 0, 1)
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
-    timer.init(mode=Timer.ONE_SHOT, period=30000, callback=hrv_results)
+    timer.init(mode=Timer.ONE_SHOT, period=30000, callback=hrv_end)
     bar.start()
     manager.collect_start()
     manager.hr.reader.start(4)
     time.sleep(.5)
-    hrvMesure = True
-    while hrvMesure == True:
+    while state == 'hrvMeasuring':
         manager.collect_hr()
         oled.show()
         if button.onepress() or len(manager.intervals) >= 35:
@@ -251,12 +254,9 @@ def hrv_mesuring():
                 oled.show()
                 time.sleep(3)
             else:
-                hrv_results(0)
-            hrvMesure = False
+                state = 'hrvResults'
+            state = 'hrvStart'
             hrv_start()
-
-
-def hrv_results(tid):
     oled.fill(0)
     timer.deinit()
     bar.stop()
@@ -272,15 +272,19 @@ def hrv_results(tid):
     oled.text(f"{values['timestamp']}", 0, 37, 1)
     oled.text("Back", 10, 56, 1)
     oled.show()
-    hrvResults = True
     manager.save_local(values)
     while hrvResults == True:
         if button.onepress():
             hrvResults = False
             hrv_start()
 
+def hrv_end(tid):
+    global state
+    state = 'hrvResults'
+
 
 def kubios_start():
+    global state
     oled.fill(0)
     oled.text("Start meruring", 0, 0, 1)
     oled.text("by placing your", 0, 10, 1)
@@ -291,9 +295,9 @@ def kubios_start():
     oled.text("Back", 70, 56, 1)
     kubios_cursor(0)
     oled.show()
-    kubiosStart = True
+    state = 'kubiosStart'
     place = 0
-    while kubiosStart == True:
+    while state == 'kubiosStart':
         if rot.fifo.has_data():
             i = rot.fifo.get()
             place += i
@@ -306,50 +310,40 @@ def kubios_start():
         oled.show()
         if button.onepress():
             if place == 0:
-                kubiosStart = False
                 kubios_mesuring()
             if place == 1:
-                kubiosStart = False
+                state = None
                 main_menu()
 
 
 def kubios_mesuring():
+    global state
     oled.fill(0)
+    state = 'kubiosMeasuring'
     manager.kubios = True
     manager.collect_start()
     oled.text("Mesuring. Press", 0, 0, 1)
     oled.text("the button to", 0, 10, 1)
     oled.text("stop early.", 0, 20, 1)
     oled.show()
-    timer.init(mode=Timer.ONE_SHOT, period=30000, callback=kubios_results)
+    timer.init(mode=Timer.ONE_SHOT, period=30000, callback=end_kubios)
     manager.hr.reader.start(4)
     time.sleep(.5)
     bar.start()
-    # Progressbar?
-    # gather data for 30s
-    # send and recive data from Kubios, save mesurment with timestamp
-    # save data
-    # move to kubios_results
-    kubiosMesure = True
 
-    while kubiosMesure == True:
+    while state == 'kubiosMeasuring':
         manager.collect_hr()
         oled.show()
         if button.onepress():
             # stop mesurment and dont save it
             manager.kubios = False
-            kubiosMesure = False
             bar.stop()
             timer.deinit()
             manager.collect_end()
             kubios_start()
 
-
-def kubios_results(tid):
     print(manager.kubios)
     oled.fill(0)
-    bar.stop()
-    manager.hr.reader.stop()
     if not manager.collect_end():
         menu_cursor(0)
         oled.text("Back", 10, 0, 1)
@@ -363,18 +357,13 @@ def kubios_results(tid):
     # display kubios data
     kubios_cursor(0)
     oled.show()
-    kubiosResults = True
     oled.fill(0)
     oled.text("Waiting results", 0, 0, 1)
     oled.text("Please wait", 0, 9, 1)
     oled.show()
-    for a in range(30):
-        time.sleep(.5)
-        print(a)
-        oled.show()
     data = manager.get_data()
     print("TEST")
-    while kubiosResults == True:
+    while state == 'kubiosResults':
         oled.fill(0)
         oled.text(f"Mean PPI:{data['data']['analysis']['mean_rr_ms']}", 0, 0, 1)
         oled.text(f"Mean HR:{data['data']['analysis']['mean_hr_bpm']:.2f}", 0, 9, 1)
@@ -386,8 +375,13 @@ def kubios_results(tid):
         menu_cursor(56)
         oled.show()
         if button.onepress():
-            kubiosResults = False
+            state = 'kubiosStart'
             kubios_start()
+
+
+def end_kubios(tid):
+    global state
+    state = 'kubiosResults'
 
 
 def history_menu():
@@ -400,7 +394,7 @@ def history_menu():
     for m in history:
         y += 10
         count += 1
-        oled.text(m[0:len(m)-5], 10, y, 1)
+        oled.text(m[0:len(m) - 5], 10, y, 1)
         if count > 5:
             continue
 
@@ -440,29 +434,29 @@ def history_menu():
             if place == 0:
                 historyMenu = False
                 main_menu()
-                
+
             if place == 1 and count >= 1:
                 historyMenu = False
                 history_show(history[0])
-                
+
             if place == 2 and count >= 2:
                 historyMenu = False
-                
+
                 history_show(history[1])
-                
+
             if place == 3 and count >= 3:
                 historyMenu = False
-                
+
                 history_show(history[2])
-                
+
             if place == 4 and count >= 4:
                 historyMenu = False
-                
+
                 history_show(history[3])
-                
+
             if place == 5 and count >= 5:
                 historyMenu = False
-                
+
                 history_show(history[4])
 
 
@@ -488,8 +482,8 @@ def history_show(alloy):
 
 # defining stuff
 micropython.alloc_emergency_exception_buf(200)
-#placeholder = [5, 2]
-rot = Encoder(10, 11)
+# placeholder = [5, 2]
+state = None
 i2c = I2C(1, scl=Pin(15), sda=Pin(14), freq=400000)
 oled_width = 128
 oled_height = 64
@@ -498,7 +492,9 @@ bar = Progressbar(oled)
 ppg = PPG(oled, 0, 0, 127, 30)
 manager = Manager(ppg)
 button = Button(12, Pin.IN, Pin.PULL_UP)
+rot = Encoder(10, 11)
 timer = Timer()
 
 main_menu()
+
 

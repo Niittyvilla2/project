@@ -21,6 +21,7 @@ class Manager:
         self.mqtt_port = 1883
         self.mqtt_topic_request = "kubios-request"
         self.mqtt_topic_response = "kubios-response"
+        self.mqtt_topic_save = "hr-data"
         self.wifi_ssid = 'KMD652_Group_2'
         self.wifi_password = 'N4fSLAzxu7VvEm8'
         self.connect_wifi()
@@ -93,10 +94,30 @@ class Manager:
         try:
             client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
             client.connect()
+            print("Connected to MQTT broker")
             return client
         except Exception as e:
             print("Upload failed: ", e)
             return None
+
+    def send_proxy(self, values):
+        client = None
+        while client is None:
+            client = self.connect_mqtt()
+            if client:
+                try:
+                    data = {"id": values['timestamp'],
+                            "timestamp": time.time(),
+                            "mean_hr": values['mean_hr'],
+                            "mean_ppi": values['mean_ppi'],
+                            "rmssd": values['rmssd'],
+                            "sdnn": values['sdnn'],}
+                    client.publish(self.mqtt_topic_save, ujson.dumps(data))
+                    client.disconnect()
+                    print('Data saved to proxy')
+                except Exception as e:
+                    print("Upload failed: ", e)
+            time.sleep(5)
 
     def send_data(self):
         print('waiting kubios')
@@ -164,6 +185,7 @@ class Manager:
 
         def callback(topic, msg):
             nonlocal message
+            print('Kubios analysis retrieved')
             message = msg
 
         while client is None:
