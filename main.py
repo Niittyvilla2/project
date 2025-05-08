@@ -458,6 +458,7 @@ def history_menu():
 
 def history_show(alloy):
     oled.fill(0)
+    menu_cursor(0)
     oled.text("Back", 10, 0, 1)
     file = "history/" + str(alloy)
     data = manager.read_history(file)

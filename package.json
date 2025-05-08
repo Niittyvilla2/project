@@ -1,7 +1,7 @@
 {
   "urls": [
     ["hr.py", "http://localhost:8000/hr.py"],
-    ["main.py", "http://localhost:8000/menus_again.py"],
+    ["main.py", "http://localhost:8000/main.py"],
     ["manager.py", "http://localhost:8000/manager.py"],
     ["PPG.py", "http://localhost:8000/PPG.py"],
     ["reader.py", "http://localhost:8000/reader.py"],
