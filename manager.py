@@ -61,8 +61,14 @@ class Manager:
     def collect_end(self):
         self.collecting = False
         self.hr.reader.stop()
-        if len(self.intervals) > self.minIntervals and self.kubios:
-            self.send_data()
+        if self.kubios:
+            if len(self.intervals) >= self.minIntervals:
+                self.send_data()
+                return True
+            else:
+                return False
+        else:
+            return True
 
     def calculate_hr(self):
         a = 0
