@@ -29,7 +29,9 @@ class Manager:
         self.screen.text("to Wi-Fi", 10, 32, 1)
         self.screen.show()
         self.connect_wifi()
-        self.client = self.connect_mqtt()
+        self.client = None
+        self.response = None
+        self.connect_mqtt()
         self.bpm = 0
         self.kubios = False
         self.rct = RTC()
@@ -98,13 +100,17 @@ class Manager:
 
     def connect_mqtt(self):
         try:
-            client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
-            client.connect()
+            self.client = MQTTClient(client_id="hrva3000", server=self.mqtt_broker, port=self.mqtt_port)
+            self.client.connect()
+            self.client.subscribe(self.mqtt_topic_response)
+            self.client.set_callback(self.mqtt_callback)
+
             print("Connected to MQTT broker")
-            return client
         except Exception as e:
             print("Upload failed: ", e)
-            return None
+
+    def mqtt_callback(self, topic, msg):
+        self.response = msg
 
     def send_proxy(self, values):
         client = None
@@ -178,24 +184,7 @@ class Manager:
         return mesurment
 
     def get_data(self):
-        message = None
-        client = None
-        counter = 0
-
-        def callback(topic, msg):
-            nonlocal message
-            print('Kubios analysis retrieved')
-            message = msg
-
-        self.client.set_callback(callback)
-        self.client.subscribe(self.mqtt_topic_response)
-        while message is None:
-            print(f"waiting for response {counter}s")
-            self.client.check_msg()
-            time.sleep(5)
-            counter += 5
-        self.save_history(message)
-        return message
+        return self.response
 
     def get_history(self):
         history_list = os.listdir("/history")
