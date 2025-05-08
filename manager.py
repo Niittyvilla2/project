@@ -191,6 +191,7 @@ class Manager:
     def get_data(self):
         message = None
         client = None
+        counter = 0
 
         def callback(topic, msg):
             nonlocal message
@@ -203,7 +204,10 @@ class Manager:
                 client.set_callback(callback)
                 client.subscribe(self.mqtt_topic_response)
                 while message is None:
+                    print(f"waiting for response {counter}s")
                     client.check_msg()
+                    time.sleep(5)
+                    counter += 5
                 client.disconnect()
                 self.save_history(message)
                 return message
@@ -224,13 +228,13 @@ class Manager:
         else:
             print("History already exists")
         values = {"id": response['id'],
-                  "mean_hr": response['data']['analysis']['mean_hr'],
-                  "mean_ppi": response['data']['analysis']['mean_ppi'],
-                  "rmssd": response['data']['analysis']['rmssd'],
-                  "sdnn": response['data']['analysis']['sdnn']}
-        if int(response['data']['analysis']['sns']) != 0:
+                  "mean_hr": response['data']['analysis']['mean_hr_bpm'],
+                  "mean_ppi": response['data']['analysis']['mean_rr_ms'],
+                  "rmssd": response['data']['analysis']['rmssd_ms'],
+                  "sdnn": response['data']['analysis']['sdnn-ms']}
+        if 'sns_index' in response:
             values['sns'] = response['data']['analysis']['sns_index']
-        if int(response['data']['analysis']['stress_index']) != 0:
+        if 'stress_index' in response:
             values['pns'] = response['data']['analysis']['stress_index']
         print(f"History: {values}")
         self.send_proxy(values)
