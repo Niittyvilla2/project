@@ -182,6 +182,7 @@ class Manager:
     def get_data(self):
         message = None
         client = None
+        counter = 0
 
         def callback(topic, msg):
             nonlocal message
@@ -189,6 +190,7 @@ class Manager:
             message = msg
 
         while client is None:
+            print(counter)
             client = self.connect_mqtt()
             if client:
                 client.set_callback(callback)
@@ -199,6 +201,7 @@ class Manager:
                 self.save_history(message)
                 return message
             time.sleep(5)
+            counter += 5
 
     def get_history(self):
         history_list = os.listdir("/history")
