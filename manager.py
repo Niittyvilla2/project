@@ -111,7 +111,7 @@ class Manager:
                             "mean_hr": values['mean_hr'],
                             "mean_ppi": values['mean_ppi'],
                             "rmssd": values['rmssd'],
-                            "sdnn": values['sdnn'],}
+                            "sdnn": values['sdnn']}
                     client.publish(self.mqtt_topic_save, ujson.dumps(data))
                     client.disconnect()
                     print('Data saved to proxy')
@@ -214,6 +214,16 @@ class Manager:
             print("History saved")
         else:
             print("History already exists")
+        values = {"id": response['id'],
+                  "mean_hr": response['data']['analysis']['mean_hr'],
+                  "mean_ppi": response['data']['analysis']['mean_ppi'],
+                  "rmssd": response['data']['analysis']['rmssd'],
+                  "sdnn": response['data']['analysis']['sdnn']}
+        if int(response['data']['analysis']['sns']) != 0:
+            values['sns'] = response['data']['analysis']['sns_index']
+        if int(response['data']['analysis']['stress_index']) != 0:
+            values['pns'] = response['data']['analysis']['stress_index']
+        self.send_proxy(values)
 
     def read_history(self, file):
         with open(file, 'r') as json_file:
