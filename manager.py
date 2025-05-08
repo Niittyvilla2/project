@@ -107,20 +107,21 @@ class Manager:
 
     def send_proxy(self, values):
         client = None
+        date = time.time()
+        data = {"id": values['timestamp'],
+                "timestamp": date,
+                "mean_hr": values['mean_hr'],
+                "mean_ppi": values['mean_ppi'],
+                "rmssd": values['rmssd'],
+                "sdnn": values['sdnn']}
+        if 'sns' in values:
+            data['sns'] = values['sns']
+        if 'pns' in values:
+            data['pns'] = values['pns']
         while client is None:
             client = self.connect_mqtt()
             if client:
                 try:
-                    data = {"id": values['timestamp'],
-                            "timestamp": time.time(),
-                            "mean_hr": values['mean_hr'],
-                            "mean_ppi": values['mean_ppi'],
-                            "rmssd": values['rmssd'],
-                            "sdnn": values['sdnn']}
-                    if 'sns' in values:
-                        data['sns'] = values['sns']
-                    if 'pns' in values:
-                        data['pns'] = values['pns']
                     client.publish(self.mqtt_topic_save, ujson.dumps(data))
                     client.disconnect()
                     print('Data saved to proxy')
