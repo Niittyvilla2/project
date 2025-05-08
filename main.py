@@ -345,7 +345,6 @@ def kubios_mesuring():
     print(manager.kubios)
     oled.fill(0)
     send = manager.collect_end()
-    time.sleep(3)
     if not send:
         menu_cursor(0)
         oled.text("Back", 10, 0, 1)
