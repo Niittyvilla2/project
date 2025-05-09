@@ -205,6 +205,7 @@ class Manager:
             print("History saved")
         else:
             print("History already exists")
+            return
         values = {"id": response['id'],
                   "mean_hr": response['data']['analysis']['mean_hr_bpm'],
                   "mean_ppi": response['data']['analysis']['mean_rr_ms'],
